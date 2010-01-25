@@ -49,16 +49,10 @@ static void display(void)
     glLoadIdentity();
     camera();
 
-    GLfloat light0_position[] = {-5.0, 1.0, 5.0, 1.0};
-    GLfloat light1_position[] = {5.0, 1.0, -5.0, 1.0};
+    GLfloat light0_position[] = {5.0, 5.0, 0.0, 1.0};
     glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
-    glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
-
-
 
     glBegin(GL_QUADS);
-        float mcolor[] = { 0.8f, 0.8f, 0.8f, 1.0f };
-        glMaterialfv(GL_FRONT, GL_AMBIENT, mcolor);
         glVertex3f( -10.0f, 0.0f, -10.0f);
         glVertex3f( 10.0f, 0.0f, -10.0f);
         glVertex3f( 10.0f, 0.0f, 10.0f);
@@ -67,13 +61,15 @@ static void display(void)
 
 
     glPushMatrix();
+        glColor3f(1.0f,1.0f,0.0f);
         glTranslated(0.0,2.0,0.0);
-        glutSolidTeapot(1.0f);
+        glutSolidTeapot(2.0f);
     glPopMatrix();
 
 
     // Draw grasses
     vector<Grass *>::iterator  iter = grasses.begin();
+    glColor3f(0.2f,0.8f,0.2f);
     while( iter != grasses.end())
     {
         (*iter)->draw();
@@ -86,16 +82,28 @@ static void display(void)
 
 void setupScene()
 {
+
     // enable lighting
     glEnable(GL_LIGHTING);
-    glEnable(GL_DEPTH_TEST);
-    /* enable light zero (note: uses default values) */
     glEnable(GL_LIGHT0);
-    glEnable(GL_LIGHT1);
-    GLfloat light0_diffuse[] = {0.5, 1.0, 0.0, 1.0};
-    GLfloat light1_diffuse[] = {1.0, 0.5, 0.0, 1.0};
+    glEnable(GL_DEPTH_TEST);
+
+    GLfloat light0_ambient[] = {0.0, 0.0, 0.0, 1.0};
+    GLfloat light0_diffuse[] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat light0_specular[] = {0.0, 0.0, 0.0, 1.0};
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light0_ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
+
+
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    float specular_color[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular_color);
+    float emission_color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emission_color);
+
 
 
     // Populate the vector with Grass objects

@@ -12,22 +12,21 @@ Grass::Grass()
     base[1] = 0.0f;
     base[2] = zpos;
 
-    mcolor[0] = 0.8f;
+    mcolor[0] = 0.0f;
     mcolor[1] = 1.0f;
-    mcolor[2] = 0.5f;
+    mcolor[2] = 0.0f;
     mcolor[3] = 1.0f;
 }
 
 Grass::~Grass()
 {
     delete base;
+    delete mcolor;
 }
 
 void Grass::draw()
 {
     glBegin(GL_QUAD_STRIP);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mcolor);
-
         glVertex3f(-0.1f + base[0], 0.0f + base[1], 1.0f + base[2]);
         glVertex3f( 0.1f + base[0], 0.0f + base[1], 1.0f + base[2]);
         glVertex3f( 0.0f + base[0], 0.8f + base[1], 0.9f + base[2]);
