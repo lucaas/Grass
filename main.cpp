@@ -29,7 +29,7 @@ static void display(void)
     const double a = t*90.0;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glColor3d(0,0,1);
+    glColor3d(0,1,0);
 
     glPushMatrix();
         glRotated(a,0,0,1);
