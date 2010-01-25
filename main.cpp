@@ -1,15 +1,22 @@
 
 #ifdef __APPLE__
-#include <GLUT/glut.h>
+    #include <GLUT/glut.h>
 #else
-#include <GL/glut.h>
+    #include <GL/glut.h>
 #endif
 
+#include <cstdlib>
 #include <stdlib.h>
 #include <math.h>
+#include <vector>
 
-float xpos = 0, ypos = 0, zpos = 0, xrot = 0, yrot = 0, angle=0.0;
+#include "grass.h"
+
+using namespace std;
+
+float xpos = 5, ypos = 2, zpos = 5, xrot = 0, yrot = -45;
 float lastx, lasty;
+vector<Grass *> grasses;
 
 void camera (void) {
     glRotatef(xrot,1.0,0.0,0.0);  //rotate our camera on the x-axis (left and right)
@@ -25,7 +32,7 @@ static void resize(int width, int height)
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
+    glFrustum(-ar, ar, -1.0, 1.0, 2.0, 200.0);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity() ;
@@ -38,22 +45,64 @@ static void display(void)
     const double a = t*90.0;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     glLoadIdentity();
     camera();
 
-    glBegin(GL_QUAD_STRIP);
-        glVertex3f(-0.1f, 0.0f, -7.0f);
-        glVertex3f( 0.1f, 0.0f, -7.0f);
-        glVertex3f( 0.0f, 0.8f, -6.9f);
-        glVertex3f( 0.2f, 0.8f, -6.9f);
-        glVertex3f( 0.1f, 1.4f, -6.5f);
-        glVertex3f( 0.3f, 1.4f, -6.5f);
-        glVertex3f( 0.2f, 1.6f, -6.0f);
-        glVertex3f( 0.4f, 1.6f, -6.0f);
+    GLfloat light0_position[] = {-5.0, 1.0, 5.0, 1.0};
+    GLfloat light1_position[] = {5.0, 1.0, -5.0, 1.0};
+    glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
+    glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
+
+
+
+    glBegin(GL_QUADS);
+        float mcolor[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+        glMaterialfv(GL_FRONT, GL_AMBIENT, mcolor);
+        glVertex3f( -10.0f, 0.0f, -10.0f);
+        glVertex3f( 10.0f, 0.0f, -10.0f);
+        glVertex3f( 10.0f, 0.0f, 10.0f);
+        glVertex3f( -10.0f, 0.0f, 10.0f);
     glEnd();
 
 
+    glPushMatrix();
+        glTranslated(0.0,2.0,0.0);
+        glutSolidTeapot(1.0f);
+    glPopMatrix();
+
+
+    // Draw grasses
+    vector<Grass *>::iterator  iter = grasses.begin();
+    while( iter != grasses.end())
+    {
+        (*iter)->draw();
+        ++iter;
+    }
+
+
     glutSwapBuffers();
+}
+
+void setupScene()
+{
+    // enable lighting
+    glEnable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
+    /* enable light zero (note: uses default values) */
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
+    GLfloat light0_diffuse[] = {0.5, 1.0, 0.0, 1.0};
+    GLfloat light1_diffuse[] = {1.0, 0.5, 0.0, 1.0};
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
+
+
+    // Populate the vector with Grass objects
+    for (int i=0; i < 1000; i++)
+        grasses.push_back(new Grass());
+
+
 }
 
 void key (unsigned char key, int x, int y) {
@@ -126,8 +175,8 @@ void mouseMovement(int x, int y) {
     int diffy=y-lasty; //check the difference between the current y and the last y position
     lastx=x; //set lastx to the current x position
     lasty=y; //set lasty to the current y position
-    xrot += (float) diffy*0.1; //set the xrot to xrot with the addition of the difference in the y position
-    yrot += (float) diffx*0.1;    //set the xrot to yrot with the addition of the difference in the x position
+    xrot += (float) diffy*0.15; //set the xrot to xrot with the addition of the difference in the y position
+    yrot += (float) diffx*0.15;    //set the xrot to yrot with the addition of the difference in the x position
 }
 
 static void idle(void)
@@ -153,19 +202,7 @@ int main(int argc, char *argv[])
     glutMouseFunc(mouseClick);
     glutIdleFunc(idle);
 
-    glShadeModel(GL_FLAT); // flat shading
-
-    glEnable(GL_LIGHTING); // enable lighting
-
-    /* enable light zero (note: uses default values) */
-    glEnable(GL_LIGHT0);
-    GLfloat light0_diffuse[] = {0.5, 1.0, 0.0, 1.0};
-    GLfloat light0_position[] = {-1.0, 0.0, 0.0, 1.0};
-
-    glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
-
-    glEnable(GL_DEPTH_TEST);
+    setupScene();
 
     glutMainLoop();
 
