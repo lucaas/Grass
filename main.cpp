@@ -29,24 +29,18 @@ static void display(void)
     const double a = t*90.0;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glColor3d(1,1,0);
+    glColor3d(0.5,1,0.5);
 
-    glPushMatrix();
-        glRotated(-1*t,0,0,1);
-        glBegin(GL_LINES);
-            glColor3f(1.0f,0.0f,0.0f);
-            glVertex3f(0.0f, 0.0f, -10.0f);
-            glColor3f(0.0f, 1.0f, 0.0f);
-            glVertex3f(0.5f, 0.5f, -10.0f);
-        glEnd();
-    glPopMatrix();
-    glPushMatrix();
-        glRotated(-12*t,0,0,1);
-        glBegin(GL_LINES);
-            glVertex3f(0.0f, 0.0f, -10.0f);
-            glVertex3f(0.7f, 0.7f, -10.0f);
-        glEnd();
-    glPopMatrix();
+    glBegin(GL_QUAD_STRIP);
+        glVertex3f(-0.5f, 0.0f, -7.0f);
+        glVertex3f( 0.5f, 0.0f, -7.0f);
+        glVertex3f(-0.4f, 0.5f, -6.0f);
+        glVertex3f( 0.6f, 0.5f, -6.0f);
+        glVertex3f( 0.1f, 1.0f, -5.0f);
+        glVertex3f( 1.1f, 1.0f, -5.0f);
+        glVertex3f( 0.8f, 1.5f, -4.0f);
+        glVertex3f( 1.8f, 1.5f, -4.0f);
+    glEnd();
 
     glutSwapBuffers();
 }
@@ -75,7 +69,9 @@ int main(int argc, char *argv[])
     glutInit(&argc, argv);
     glutInitWindowSize(640,480);
     glutInitWindowPosition(10,10);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+
+
 
     glutCreateWindow("GLUT Shapes");
 
@@ -83,6 +79,20 @@ int main(int argc, char *argv[])
     glutDisplayFunc(display);
     glutKeyboardFunc(key);
     glutIdleFunc(idle);
+
+    glShadeModel(GL_FLAT); // flat shading
+
+    glEnable(GL_LIGHTING); // enable lighting
+
+    /* enable light zero (note: uses default values) */
+    glEnable(GL_LIGHT0);
+    GLfloat light0_diffuse[] = {0.5, 1.0, 0.0, 1.0};
+    GLfloat light0_position[] = {-1.0, 0.0, 0.0, 1.0};
+
+    glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
+
+    glEnable(GL_DEPTH_TEST);
 
     glutMainLoop();
 
