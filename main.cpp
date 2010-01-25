@@ -32,7 +32,7 @@ static void display(void)
     glColor3d(1,1,0);
 
     glPushMatrix();
-        glRotated(-1*a,0,0,1);
+        glRotated(-1*t,0,0,1);
         glBegin(GL_LINES);
             glColor3f(1.0f,0.0f,0.0f);
             glVertex3f(0.0f, 0.0f, -10.0f);
@@ -41,7 +41,7 @@ static void display(void)
         glEnd();
     glPopMatrix();
     glPushMatrix();
-        glRotated(-2*a,0,0,1);
+        glRotated(-12*t,0,0,1);
         glBegin(GL_LINES);
             glVertex3f(0.0f, 0.0f, -10.0f);
             glVertex3f(0.7f, 0.7f, -10.0f);
