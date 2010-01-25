@@ -9,7 +9,7 @@
 #include <math.h>
 
 float xpos = 0, ypos = 0, zpos = 0, xrot = 0, yrot = 0, angle=0.0;
-float lastx, lasty;
+float lastx = 320.0f, lasty = 240.0f;
 
 void camera (void) {
     glRotatef(xrot,1.0,0.0,0.0);  //rotate our camera on the x-axis (left and right)
@@ -40,8 +40,6 @@ static void display(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     camera();
-
-    glRotated(a, 0.0, 1.0, 0.0);
 
     glBegin(GL_QUAD_STRIP);
         glVertex3f(-0.1f, 0.0f, -7.0f);
@@ -115,6 +113,14 @@ void key (unsigned char key, int x, int y) {
     glutPostRedisplay();
 }
 
+void mouseClick(int button, int state, int x, int y) {
+    if(state == GLUT_DOWN)
+    {
+        lastx=x;
+        lasty=y;
+    }
+}
+
 void mouseMovement(int x, int y) {
     int diffx=x-lastx; //check the difference between the current x and the last x position
     int diffy=y-lasty; //check the difference between the current y and the last y position
@@ -144,6 +150,7 @@ int main(int argc, char *argv[])
     glutDisplayFunc(display);
     glutKeyboardFunc(key);
     glutMotionFunc(mouseMovement);
+    glutMouseFunc(mouseClick);
     glutIdleFunc(idle);
 
     glShadeModel(GL_FLAT); // flat shading
