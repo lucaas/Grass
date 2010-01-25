@@ -9,7 +9,7 @@
 #include <math.h>
 
 float xpos = 0, ypos = 0, zpos = 0, xrot = 0, yrot = 0, angle=0.0;
-float lastx = 320.0f, lasty = 240.0f;
+float lastx, lasty;
 
 void camera (void) {
     glRotatef(xrot,1.0,0.0,0.0);  //rotate our camera on the x-axis (left and right)
