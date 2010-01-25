@@ -12,16 +12,11 @@ Grass::Grass()
     base[1] = 0.0f;
     base[2] = zpos;
 
-    mcolor[0] = 0.0f;
-    mcolor[1] = 1.0f;
-    mcolor[2] = 0.0f;
-    mcolor[3] = 1.0f;
 }
 
 Grass::~Grass()
 {
     delete base;
-    delete mcolor;
 }
 
 void Grass::draw()
