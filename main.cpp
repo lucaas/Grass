@@ -52,6 +52,7 @@ static void display(void)
     GLfloat light0_position[] = {5.0, 5.0, 0.0, 1.0};
     glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
 
+    //Draw plane
     glBegin(GL_QUADS);
         glVertex3f( -10.0f, 0.0f, -10.0f);
         glVertex3f( 10.0f, 0.0f, -10.0f);
@@ -59,7 +60,7 @@ static void display(void)
         glVertex3f( -10.0f, 0.0f, 10.0f);
     glEnd();
 
-
+    //Draw teapot
     glPushMatrix();
         glColor3f(1.0f,1.0f,0.0f);
         glTranslated(0.0,2.0,0.0);
