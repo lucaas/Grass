@@ -54,28 +54,23 @@ static void display(void)
 
     //Draw plane
     glBegin(GL_QUADS);
+        glColor3f(1.0f,1.0f,1.0f);
         glVertex3f( -10.0f, 0.0f, -10.0f);
         glVertex3f( 10.0f, 0.0f, -10.0f);
         glVertex3f( 10.0f, 0.0f, 10.0f);
         glVertex3f( -10.0f, 0.0f, 10.0f);
     glEnd();
 
-    //Draw teapot
-    glPushMatrix();
-        glColor3f(1.0f,1.0f,0.0f);
-        glTranslated(0.0,2.0,0.0);
-        glutSolidTeapot(2.0f);
-    glPopMatrix();
-
-
     // Draw grasses
     vector<Grass *>::iterator  iter = grasses.begin();
     glColor3f(0.2f,0.8f,0.2f);
+    glLineWidth(3);
     while( iter != grasses.end())
     {
         (*iter)->draw();
         ++iter;
     }
+
 
 
     glutSwapBuffers();
@@ -84,9 +79,9 @@ static void display(void)
 void setupScene()
 {
 
-    // enable lighting
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
+    //enable lighting
+   // glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
 
     GLfloat light0_ambient[] = {0.0, 0.0, 0.0, 1.0};
@@ -105,11 +100,13 @@ void setupScene()
     float emission_color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emission_color);
 
-
+    glClearColor(0.2,0.2,0.6,0.0);
 
     // Populate the vector with Grass objects
-    for (int i=0; i < 1000; i++)
-        grasses.push_back(new Grass());
+    //for (int i=0; i < 1000; i++)
+        //grasses.push_back(new Grass());
+
+    grasses.push_back(new Grass(0.0f, 0.0f));
 
 
 }
