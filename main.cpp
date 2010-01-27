@@ -9,12 +9,15 @@
 #include <stdlib.h>
 #include <math.h>
 #include <vector>
+#include "vmath.h"
 
 #include "grass.h"
 
 using namespace std;
 
-float xpos = 5, ypos = 2, zpos = 5, xrot = 0, yrot = -45;
+Vector3f wind = Vector3f(1,0,0);
+float lastTime = 0.0f;
+float xpos = 0, ypos = 2, zpos = 5, xrot = 0, yrot = 0;
 float lastx, lasty;
 vector<Grass *> grasses;
 
@@ -42,6 +45,8 @@ static void resize(int width, int height)
 static void display(void)
 {
     const double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
+    float deltaT = t - lastTime;
+    lastTime = t;
     const double a = t*90.0;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -67,6 +72,7 @@ static void display(void)
     glLineWidth(3);
     while( iter != grasses.end())
     {
+        (*iter)->calculate(wind, deltaT);
         (*iter)->draw();
         ++iter;
     }
@@ -103,10 +109,9 @@ void setupScene()
     glClearColor(0.2,0.2,0.6,0.0);
 
     // Populate the vector with Grass objects
-    //for (int i=0; i < 1000; i++)
-        //grasses.push_back(new Grass());
-
-    grasses.push_back(new Grass(0.0f, 0.0f));
+    for (int i=0; i < 500; i++)
+        grasses.push_back(new Grass());
+    //grasses.push_back(new Grass(0.0f, 0.0f));
 
 
 }
@@ -122,6 +127,21 @@ void key (unsigned char key, int x, int y) {
     {
     xrot -= 1;
     if (xrot < -360) xrot += 360;
+    }
+
+    if (key=='u')
+    {
+        wind.x = 0;
+    }
+
+    if (key=='i')
+    {
+        wind.x += 0.1;
+    }
+
+    if (key=='k')
+    {
+        wind.x -= 0.1;
     }
 
     if (key=='w')

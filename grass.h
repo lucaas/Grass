@@ -4,6 +4,10 @@
     #include <GL/glut.h>
 #endif
 
+#include "vmath.h"
+#include <cstdlib>
+#include <math.h>
+
 class Grass
 {
 private:
@@ -21,5 +25,5 @@ public:
     ~Grass();
 
     void draw();
-    void calculate();
+    void calculate(Vector3f wind, float deltaT);
 };
