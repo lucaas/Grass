@@ -45,9 +45,14 @@ void Grass::calculate(Vector3f wind, float deltaT)
     Vector3f position = -Vector3f(radius1*cos(DEG2RAD(theta)), radius1*sin(DEG2RAD(theta)), 0);
     Vector3f F = (wind+Vector3f(0.0, -9.82, 0.0));
 
-    float alpha = M_PI/2 - acos(position.dotProduct(F)/(position.length()*F.length()));
+    // acos() takes values in the interval [-1, 1], make sure we are in that range.
+    float cosValue = position.dotProduct(F)/(position.length()*F.length());
+    if (cosValue < -1) cosValue = -1;
+    if (cosValue >  1) cosValue =  1;
 
-    float Fr = F.length()*cos(alpha);
+    // cos(pi/2 - acos(x)) = sqrt(1-x*x)
+    float Fr = F.length() * sqrt(1-cosValue*cosValue);
+
 
     float tau = radius1*Fr - K*(theta - theta0);
     omega = omega + (1/inertia)*tau*deltaT;
