@@ -109,9 +109,9 @@ void setupScene()
     glClearColor(0.2,0.2,0.6,0.0);
 
     // Populate the vector with Grass objects
-    for (int i=0; i < 500; i++)
-        grasses.push_back(new Grass());
-    //grasses.push_back(new Grass(0.0f, 0.0f));
+   // for (int i=0; i < 500; i++)
+     //   grasses.push_back(new Grass());
+    grasses.push_back(new Grass(0.0f, 0.0f));
 
 
 }
@@ -136,12 +136,12 @@ void key (unsigned char key, int x, int y) {
 
     if (key=='i')
     {
-        wind.x += 0.1;
+        wind.x += 0.5;
     }
 
     if (key=='k')
     {
-        wind.x -= 0.1;
+        wind.x -= 0.5;
     }
 
     if (key=='w')

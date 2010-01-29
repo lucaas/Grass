@@ -26,8 +26,8 @@ Grass::Grass(float x, float z)
     base[1] = 0.0f;
     base[2] = z;
 
-    theta0 = 90 + 40.0*(rand()/float(RAND_MAX)) - 20.0;
-    theta = theta0;
+   // theta0 = 90 + 40.0*(rand()/float(RAND_MAX)) - 20.0;
+    theta = theta0 = 90;
     omega = 0;
 
     radius1 = 1.8f;
@@ -42,17 +42,20 @@ Grass::~Grass()
 
 void Grass::calculate(Vector3f wind, float deltaT)
 {
-    Vector3f position = -Vector3f(radius1*cos(DEG2RAD(theta)), radius1*sin(DEG2RAD(theta)), 0);
+    Vector3f position = Vector3f(radius1*cos(DEG2RAD(theta)), radius1*sin(DEG2RAD(theta)), 0);
     Vector3f F = (wind+Vector3f(0.0, -9.82, 0.0));
+    //kVector3f F = (wind);
 
     // acos() takes values in the interval [-1, 1], make sure we are in that range.
     float cosValue = position.dotProduct(F)/(position.length()*F.length());
     if (cosValue < -1) cosValue = -1;
     if (cosValue >  1) cosValue =  1;
 
-    // cos(pi/2 - acos(x)) = sqrt(1-x*x)
-    float Fr = F.length() * sqrt(1-cosValue*cosValue);
+    // TODO: we need the direction of the force...
 
+
+    // sin(acos(x)) = cos(pi/2 - acos(x)) = sqrt(1-x*x)
+    float Fr =  F.length() * sqrt(1 - cosValue*cosValue);
 
     float tau = radius1*Fr - K*(theta - theta0);
     omega = omega + (1/inertia)*tau*deltaT;
