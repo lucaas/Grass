@@ -7,25 +7,23 @@
 
 #include <cstdlib>
 #include <stdlib.h>
-#include <math.h>
-#include <vector>
-#include "vmath.h"
 
+#include <vector>
+
+#include "vmath.h"
 #include "grass.h"
+#include "grasscamera.h"
 
 using namespace std;
 
 Vector3f wind = Vector3f(1,0,0);
 float lastTime = 0.0f;
-float xpos = 0, ypos = 2, zpos = 5, xrot = 0, yrot = 0;
-float lastx, lasty;
+
 vector<Grass *> grasses;
 
-void camera (void) {
-    glRotatef(xrot,1.0,0.0,0.0);  //rotate our camera on the x-axis (left and right)
-    glRotatef(yrot,0.0,1.0,0.0);  //rotate our camera on the y-axis (up and down)
-    glTranslated(-xpos,-ypos,-zpos); //translate the screen to the position of our camera
-}
+GrassCamera camera;
+
+
 
 /* GLUT callback Handlers */
 static void resize(int width, int height)
@@ -47,12 +45,11 @@ static void display(void)
     const double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
     float deltaT = t - lastTime;
     lastTime = t;
-    const double a = t*90.0;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
-    camera();
+    camera.move();
 
     GLfloat light0_position[] = {5.0, 5.0, 0.0, 1.0};
     glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
@@ -116,94 +113,36 @@ void setupScene()
 
 }
 
-void key (unsigned char key, int x, int y) {
-    if (key=='q')
-    {
-    xrot += 1;
-    if (xrot >360) xrot -= 360;
-    }
+// Key handeler
+void key (unsigned char key, int x, int y)
+{
+    camera.key(key, x, y);
 
-    if (key=='z')
-    {
-    xrot -= 1;
-    if (xrot < -360) xrot += 360;
-    }
-
+    // Wind control
     if (key=='u')
-    {
         wind.x = 0;
-    }
-
     if (key=='i')
-    {
         wind.x += 0.5;
-    }
-
     if (key=='k')
-    {
         wind.x -= 0.5;
-    }
 
-    if (key=='w')
-    {
-    float xrotrad, yrotrad;
-    yrotrad = (yrot / 180 * 3.141592654f);
-    xrotrad = (xrot / 180 * 3.141592654f);
-    xpos += float(sin(yrotrad)) ;
-    zpos -= float(cos(yrotrad)) ;
-    ypos -= float(sin(xrotrad)) ;
-    }
+    // ESC => Exit
+    if (key == 27)
+        exit(0);
 
-    if (key=='s')
-    {
-    float xrotrad, yrotrad;
-    yrotrad = (yrot / 180 * 3.141592654f);
-    xrotrad = (xrot / 180 * 3.141592654f);
-    xpos -= float(sin(yrotrad));
-    zpos += float(cos(yrotrad)) ;
-    ypos += float(sin(xrotrad));
-    }
 
-    if (key=='d')
-    {
-    float yrotrad;
-    yrotrad = (yrot / 180 * 3.141592654f);
-    xpos += float(cos(yrotrad)) * 0.2;
-    zpos += float(sin(yrotrad)) * 0.2;
-    }
-
-    if (key=='a')
-    {
-    float yrotrad;
-    yrotrad = (yrot / 180 * 3.141592654f);
-    xpos -= float(cos(yrotrad)) * 0.2;
-    zpos -= float(sin(yrotrad)) * 0.2;
-    }
-
-    if (key==27)
-    {
-    exit(0);
-    }
-
-    glutPostRedisplay();
 }
-
-void mouseClick(int button, int state, int x, int y) {
-    if(state == GLUT_DOWN)
-    {
-        lastx=x;
-        lasty=y;
-    }
+void mouseClick(int button, int state, int x, int y)
+{
+    camera.mouseClick(button, state, x, y);
 }
 
 void mouseMovement(int x, int y) {
-    int diffx=x-lastx; //check the difference between the current x and the last x position
-    int diffy=y-lasty; //check the difference between the current y and the last y position
-    lastx=x; //set lastx to the current x position
-    lasty=y; //set lasty to the current y position
-    xrot += (float) diffy*0.15; //set the xrot to xrot with the addition of the difference in the y position
-    yrot += (float) diffx*0.15;    //set the xrot to yrot with the addition of the difference in the x position
+    camera.mouseMovement(x, y);
 }
+
+
+
 
 static void idle(void)
 {
