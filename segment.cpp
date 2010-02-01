@@ -26,6 +26,7 @@ void Segment::init(const Vector3f &parent, float parentAngle, float theLength)
     inertia = (mass * length * length) / 3.0f;
 
     angle = parentAngle;
+    angularVelocity = 0.0f;
 
     position = Vector3f(parent.x + cos(parentAngle)*length, parent.y + sin(parentAngle)*length, parent.z);
 
