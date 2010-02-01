@@ -7,19 +7,7 @@ Grass::Grass()
     float xpos = 20.0*(rand()/float(RAND_MAX)) - 10.0;
     float zpos = 20.0*(rand()/float(RAND_MAX)) - 10.0;
 
-    base[0] = xpos;
-    base[1] = 0.0f;
-    base[2] = zpos;
-
-    theta0 = 90 + 20.0*(rand()/float(RAND_MAX)) - 10.0;
-    theta = theta0;
-
-    radius1 = 1.8f;
-    K = 2.0f;
-
-    // (0.003g * 0.5m * 0.5m) / 3
-    inertia = 0.00025f;
-
+    Grass(xpos,zpos);
 }
 
 Grass::Grass(float x, float z)
