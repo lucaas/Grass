@@ -51,11 +51,12 @@ void Grass::calculate(Vector3f wind, float deltaT)
     if (cosValue < -1) cosValue = -1;
     if (cosValue >  1) cosValue =  1;
 
-    // TODO: we need the direction of the force...
-
+    // TODO: we   need the direction of the force...
+    // current direction only works if the grass is oriented in the x-direction
+    float direction = (F.x > 0) ? 1 : -1;
 
     // sin(acos(x)) = cos(pi/2 - acos(x)) = sqrt(1-x*x)
-    float Fr =  F.length() * sqrt(1 - cosValue*cosValue);
+    float Fr = direction * F.length() * sqrt(1 - cosValue*cosValue);
 
     float tau = radius1*Fr - K*(theta - theta0);
     omega = omega + (1/inertia)*tau*deltaT;
