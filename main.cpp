@@ -80,8 +80,8 @@ void setupScene()
 {
 
     //enable lighting
-   // glEnable(GL_LIGHTING);
-    //glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
 
     GLfloat light0_ambient[] = {0.0, 0.0, 0.0, 1.0};
@@ -103,8 +103,9 @@ void setupScene()
     glClearColor(0.2,0.2,0.6,0.0);
 
     // Populate the vector with Grass objects
-   // for (int i=0; i < 400; i++)
-    //    grasses.push_back(new Grass());
+    for (int i=0; i < 10000; i++)
+       grasses.push_back(new Grass());
+
     grasses.push_back(new Grass(-8.0f, 0.0f));
     grasses.push_back(new Grass(.0f, 0.0f));
     grasses.push_back(new Grass(8.0f, 0.0f));
@@ -147,6 +148,7 @@ static void idle(void)
 {
 
 
+
     double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
 
         double timestep;
@@ -161,6 +163,7 @@ static void idle(void)
         vector<Grass *>::iterator  iter = grasses.begin();
         while( iter != grasses.end())
         {
+            wind.x += 0.001*rand()/(RAND_MAX) - 0.0005;
             (*iter)->calculate(wind, timestep);
             ++iter;
         }
