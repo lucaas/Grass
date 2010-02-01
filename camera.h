@@ -6,7 +6,7 @@
 #ifndef __CAMERA_H__
 #define __CAMERA_H__
 
-class GrassCamera
+class Camera
 {
 private:
 // Variables to save current state
@@ -18,7 +18,7 @@ float yrot;
 float lastx, lasty;
 
 public:
-    GrassCamera();
+    Camera();
     void move (void);
     void key (unsigned char key, int x, int y);
     void mouseClick(int button, int state, int x, int y);

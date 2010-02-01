@@ -1,4 +1,5 @@
 #include "grass.h"
+#include "segment.h"
 
 Grass::Grass()
 {
@@ -12,61 +13,46 @@ Grass::Grass()
 
 Grass::Grass(float x, float z)
 {
-    base[0] = x;
-    base[1] = 0.0f;
-    base[2] = z;
+    base.x = x;
+    base.y = 0.0f;
+    base.z = z;
 
-   // theta0 = 90 + 40.0*(rand()/float(RAND_MAX)) - 20.0;
-    theta = theta0 = 90;
-    omega = 0;
+    initialAngle = 90.0f;
 
-    radius1 = 0.7f; // 0.7 meter
-    mass1 = 0.005f; // 5gram
-    K = 0.5f;
+    segments[0] = Segment(base, initialAngle);
+    segments[1] = Segment(segments[0].getPosition(), segments[0].getAngle());
+    segments[2] = Segment(segments[1].getPosition(), segments[1].getAngle());
 
-    // (0.003g * 0.5m * 0.5m) / 3
-    inertia = (mass1 * radius1 * radius1) / 3.0f;
+
 }
 
 Grass::~Grass()
 {
-    delete base;
+    delete segments;
 }
 
-void Grass::calculate(Vector3f wind, float deltaT)
+void Grass::calculate(Vector3f wind, float timestep)
 {
-    Vector3f position = Vector3f(radius1*cos(DEG2RAD(theta)), radius1*sin(DEG2RAD(theta)), 0);
-    Vector3f F = (wind+Vector3f(0.0, -9.82*mass1, 0.0));
-    //kVector3f F = (wind);
+    segments[0].calculatePosition(wind, base, initialAngle, timestep);
+    for (int i=1; i < NUM_SEGMENTS; i++)
+        segments[i].calculatePosition(wind, segments[i-1].getPosition(), segments[i-1].getAngle(), timestep);
 
-    // acos() takes values in the interval [-1, 1], make sure we are in that range.
-    float cosValue = position.dotProduct(F)/(position.length()*F.length());
-    if (cosValue < -1) cosValue = -1;
-    if (cosValue >  1) cosValue =  1;
-
-    // TODO: we   need the direction of the force...
-    // current direction only works if the grass is oriented in the x-direction
-    float direction = (F.x > 0) ? 1 : -1;
-
-    // sin(acos(x)) = cos(pi/2 - acos(x)) = sqrt(1-x*x)
-    float Fr = direction * F.length() * sqrt(1 - cosValue*cosValue);
-
-    float tau = 0.5f*radius1*Fr - K*(theta - theta0);
-    omega = omega + (1.0f/inertia)*tau*deltaT;
-    omega *= 0.999;
-
-    theta = theta + omega*deltaT;
 }
 
 void Grass::draw()
 {
-    glBegin(GL_LINES);
-        glVertex3f(base[0], base[1], base[2]);
-        glVertex3f(base[0] + radius1*cos(DEG2RAD(theta)), base[1] + radius1*sin(DEG2RAD(theta)), base[2]);
+    glBegin(GL_LINE_STRIP);
+        glVertex3f(base.x, base.y, base.z);
+        for (int i=0; i < NUM_SEGMENTS; i++)
+        {
+            Vector3f point = segments[i].getPosition();
+            glVertex3f(point.x, point.y, point.z);
+        }
     glEnd();
+
     /*glBegin(GL_LINES);
         glColor3f(1.0,1.0,0.0);
-        glVertex3f(base[0], base[1], base[2]);
-        glVertex3f(base[0] + radius1*cos(theta0*(3.14159f/180.0f)), base[1] + radius1*sin(theta0*(3.14159f/180.0f)), base[2]);
+        glVertex3f(points[0][0], points[0][1], points[0][2]);
+        glVertex3f(points[0][0] + radius[0]*cos(theta0*(3.14159f/180.0f)), points[0][1] + radius[0]*sin(theta0*(3.14159f/180.0f)), points[0][2]);
     glEnd();*/
 }

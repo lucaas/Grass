@@ -1,5 +1,5 @@
 
-#include "grasscamera.h"
+#include "camera.h"
 #ifdef __APPLE__
     #include <GLUT/glut.h>
 #else
@@ -8,7 +8,7 @@
 #include <math.h>
 
 
-GrassCamera::GrassCamera()
+Camera::Camera()
 {
     xpos = 0;
     ypos = 1;
@@ -17,14 +17,14 @@ GrassCamera::GrassCamera()
     yrot = 0;
 }
 
-void GrassCamera::move (void) {
+void Camera::move (void) {
     glRotatef(xrot,1.0,0.0,0.0);  //rotate our camera on the x-axis (left and right)
     glRotatef(yrot,0.0,1.0,0.0);  //rotate our camera on the y-axis (up and down)
     glTranslated(-xpos,-ypos,-zpos); //translate the screen to the position of our camera
 }
 
 
-void GrassCamera::key (unsigned char key, int x, int y) {
+void Camera::key (unsigned char key, int x, int y) {
     if (key=='q')
     {
         xrot += 1;
@@ -78,7 +78,7 @@ void GrassCamera::key (unsigned char key, int x, int y) {
     glutPostRedisplay();
 }
 
-void GrassCamera::mouseClick(int button, int state, int x, int y) {
+void Camera::mouseClick(int button, int state, int x, int y) {
     if(state == GLUT_DOWN)
     {
         lastx=x;
@@ -86,7 +86,7 @@ void GrassCamera::mouseClick(int button, int state, int x, int y) {
     }
 }
 
-void GrassCamera::mouseMovement(int x, int y) {
+void Camera::mouseMovement(int x, int y) {
     int diffx=x-lastx; //check the difference between the current x and the last x position
     int diffy=y-lasty; //check the difference between the current y and the last y position
     lastx=x; //set lastx to the current x position

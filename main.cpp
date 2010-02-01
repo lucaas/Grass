@@ -12,7 +12,7 @@
 
 #include "vmath.h"
 #include "grass.h"
-#include "grasscamera.h"
+#include "camera.h"
 
 using namespace std;
 
@@ -21,7 +21,7 @@ float lastTime = 0.0f;
 
 vector<Grass *> grasses;
 
-GrassCamera camera;
+Camera camera;
 
 
 
@@ -33,7 +33,7 @@ static void resize(int width, int height)
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glFrustum(-ar, ar, -1.0, 1.0, 1.0, 200.0);
+    glFrustum(-ar, ar, -1.0, 1.0, 2.5, 100.0);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
