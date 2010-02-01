@@ -16,7 +16,9 @@ Grass::Grass()
 
     radius1 = 1.8f;
     K = 2.0f;
-    inertia = 1.0f;
+
+    // (0.003g * 0.5m * 0.5m) / 3
+    inertia = 0.00025f;
 
 }
 
