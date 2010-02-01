@@ -20,11 +20,12 @@ Grass::Grass(float x, float z)
     theta = theta0 = 90;
     omega = 0;
 
-    radius1 = 1.8f;
-    K = 2.0f;
+    radius1 = 0.3f*(rand()/float(RAND_MAX)) - 0.1f;
+    mass1 = 0.001f;
+    K = 10.0f;
 
     // (0.003g * 0.5m * 0.5m) / 3
-    inertia = 0.00025f;
+    inertia = (mass1 * radius1 * radius1) / 3.0f;
 }
 
 Grass::~Grass()
@@ -35,7 +36,7 @@ Grass::~Grass()
 void Grass::calculate(Vector3f wind, float deltaT)
 {
     Vector3f position = Vector3f(radius1*cos(DEG2RAD(theta)), radius1*sin(DEG2RAD(theta)), 0);
-    Vector3f F = (wind+Vector3f(0.0, -9.82, 0.0));
+    Vector3f F = (wind+Vector3f(0.0, -9.82*mass1, 0.0));
     //kVector3f F = (wind);
 
     // acos() takes values in the interval [-1, 1], make sure we are in that range.
@@ -50,9 +51,10 @@ void Grass::calculate(Vector3f wind, float deltaT)
     // sin(acos(x)) = cos(pi/2 - acos(x)) = sqrt(1-x*x)
     float Fr = direction * F.length() * sqrt(1 - cosValue*cosValue);
 
-    float tau = radius1*Fr - K*(theta - theta0);
+    float tau = 0.5f*radius1*Fr - K*(theta - theta0);
     omega = omega + (1/inertia)*tau*deltaT;
     omega *= 0.9999;
+
     theta = theta + omega*deltaT;
 }
 

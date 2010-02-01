@@ -15,6 +15,7 @@ private:
     float inertia; // Vridmoment
     float base[3]; // Bas (P0)
     float radius1; // Radie (P0 - P1)
+    float mass1; // Vikt på en sektion
     float theta0; // Jämviktsläge
     float theta; // Nuvarande läge
     float omega; // Vinkelhastighet

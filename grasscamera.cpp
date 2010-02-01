@@ -11,8 +11,8 @@
 GrassCamera::GrassCamera()
 {
     xpos = 0;
-    ypos = 2;
-    zpos = 5;
+    ypos = 1;
+    zpos = 2.5;
     xrot = 0;
     yrot = 0;
 }
