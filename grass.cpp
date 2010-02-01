@@ -22,11 +22,12 @@ void Grass::init(float x, float z)
     base.y = 0.0f;
     base.z = z;
 
-    //initialAngle = 70.0f + 40.0*(rand()/float(RAND_MAX));
-    initialAngle = 90.0f;
-    segments[0] = Segment(base, initialAngle);
-    segments[1] = Segment(segments[0].getPosition(), segments[0].getAngle(), 0.25f);
-    segments[2] = Segment(segments[1].getPosition(), segments[1].getAngle(), 0.2f);
+    initialAngle = 80.0f + 20.0*(rand()/float(RAND_MAX)); // 80-100 degrees
+	float lengthMultiplier = 0.75 + 0.25*(rand()/float(RAND_MAX)); // 0.75-1 * length
+
+    segments[0] = Segment(base, initialAngle, lengthMultiplier * 0.4f);
+    segments[1] = Segment(segments[0].getPosition(), segments[0].getAngle(), lengthMultiplier * 0.25f);
+    segments[2] = Segment(segments[1].getPosition(), segments[1].getAngle(), lengthMultiplier * 0.2f);
 
 
 }
