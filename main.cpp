@@ -53,7 +53,7 @@ static void display(void)
 
     //Draw plane
     glBegin(GL_QUADS);
-        glColor3f(1.0f,1.0f,1.0f);
+        glColor3f(0.3f,0.5f,0.2f);
         glVertex3f( -10.0f, 0.0f, -10.0f);
         glVertex3f( 10.0f, 0.0f, -10.0f);
         glVertex3f( 10.0f, 0.0f, 10.0f);
@@ -106,9 +106,6 @@ void setupScene()
     for (int i=0; i < 10000; i++)
        grasses.push_back(new Grass());
 
-    grasses.push_back(new Grass(-8.0f, 0.0f));
-    grasses.push_back(new Grass(.0f, 0.0f));
-    grasses.push_back(new Grass(8.0f, 0.0f));
 
 
 }
