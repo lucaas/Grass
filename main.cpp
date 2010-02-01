@@ -33,18 +33,17 @@ static void resize(int width, int height)
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glFrustum(-ar, ar, -1.0, 1.0, 2.0, 200.0);
+    glFrustum(-ar, ar, -1.0, 1.0, 1.0, 200.0);
 
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity() ;
+    glLoadIdentity();
 
 }
 
 static void display(void)
 {
-    const double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
-    float deltaT = t - lastTime;
-    lastTime = t;
+
+
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -69,7 +68,6 @@ static void display(void)
     glLineWidth(3);
     while( iter != grasses.end())
     {
-        (*iter)->calculate(wind, deltaT);
         (*iter)->draw();
         ++iter;
     }
@@ -146,6 +144,20 @@ void mouseMovement(int x, int y) {
 
 static void idle(void)
 {
+
+    double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
+
+    double deltaT = t - lastTime;
+    lastTime = t;
+
+
+    vector<Grass *>::iterator  iter = grasses.begin();
+    while( iter != grasses.end())
+    {
+        (*iter)->calculate(wind, (float)deltaT);
+        ++iter;
+    }
+   // printf("time: %f\n", deltaT);
     glutPostRedisplay();
 }
 

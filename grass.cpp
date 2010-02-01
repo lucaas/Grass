@@ -20,9 +20,9 @@ Grass::Grass(float x, float z)
     theta = theta0 = 90;
     omega = 0;
 
-    radius1 = 0.3f*(rand()/float(RAND_MAX)) - 0.1f;
-    mass1 = 0.001f;
-    K = 10.0f;
+    radius1 = 0.7f; // 0.7 meter
+    mass1 = 0.005f; // 5gram
+    K = 0.5f;
 
     // (0.003g * 0.5m * 0.5m) / 3
     inertia = (mass1 * radius1 * radius1) / 3.0f;
@@ -52,8 +52,8 @@ void Grass::calculate(Vector3f wind, float deltaT)
     float Fr = direction * F.length() * sqrt(1 - cosValue*cosValue);
 
     float tau = 0.5f*radius1*Fr - K*(theta - theta0);
-    omega = omega + (1/inertia)*tau*deltaT;
-    omega *= 0.9999;
+    omega = omega + (1.0f/inertia)*tau*deltaT;
+    omega *= 0.999;
 
     theta = theta + omega*deltaT;
 }
@@ -62,9 +62,8 @@ void Grass::draw()
 {
     glBegin(GL_LINES);
         glVertex3f(base[0], base[1], base[2]);
-        glVertex3f(base[0] + radius1*cos(theta*(3.14159f/180.0f)), base[1] + radius1*sin(theta*(3.14159f/180.0f)), base[2]);
+        glVertex3f(base[0] + radius1*cos(DEG2RAD(theta)), base[1] + radius1*sin(DEG2RAD(theta)), base[2]);
     glEnd();
-
     /*glBegin(GL_LINES);
         glColor3f(1.0,1.0,0.0);
         glVertex3f(base[0], base[1], base[2]);
