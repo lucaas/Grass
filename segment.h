@@ -20,8 +20,9 @@ private:
 
 public:
     Segment();
-    Segment(const Vector3f &parent, float parentAngle);
-    void calculatePosition(const Vector3f &wind, const Vector3f &parent, float parentAngle, float timestep);
+    Segment(const Vector3f &parent, float parentAngle, float theLength = 0.3f);
+    void init(const Vector3f &parent, float parentAngle, float theLength);
+    void calculatePosition(const Vector3f &wind, const Vector3f &parent, float parentAngle, double timestep);
     Vector3f getPosition();
     float getAngle();
 };

@@ -12,7 +12,7 @@ Camera::Camera()
 {
     xpos = 0;
     ypos = 1;
-    zpos = 2.5;
+    zpos = 4;
     xrot = 0;
     yrot = 0;
 }

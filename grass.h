@@ -23,8 +23,10 @@ private:
 public:
     Grass();
     Grass(float x, float z);
+    void init(float x, float z);
+
     ~Grass();
 
     void draw();
-    void calculate(Vector3f wind, float timestep);
+    void calculate(Vector3f wind, double timestep);
 };

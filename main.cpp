@@ -16,8 +16,8 @@
 
 using namespace std;
 
-Vector3f wind = Vector3f(1,0,0);
-float lastTime = 0.0f;
+Vector3f wind = Vector3f(0,0,0);
+double lastTime = 0.0;
 
 vector<Grass *> grasses;
 
@@ -43,8 +43,6 @@ static void resize(int width, int height)
 static void display(void)
 {
 
-
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
@@ -63,9 +61,10 @@ static void display(void)
     glEnd();
 
     // Draw grasses
-    vector<Grass *>::iterator  iter = grasses.begin();
-    glColor3f(0.2f,0.8f,0.2f);
+
     glLineWidth(3);
+
+    vector<Grass *>::iterator  iter = grasses.begin();
     while( iter != grasses.end())
     {
         (*iter)->draw();
@@ -104,9 +103,11 @@ void setupScene()
     glClearColor(0.2,0.2,0.6,0.0);
 
     // Populate the vector with Grass objects
-   // for (int i=0; i < 500; i++)
-     //   grasses.push_back(new Grass());
-    grasses.push_back(new Grass(0.0f, 0.0f));
+   // for (int i=0; i < 400; i++)
+    //    grasses.push_back(new Grass());
+    grasses.push_back(new Grass(-8.0f, 0.0f));
+    grasses.push_back(new Grass(.0f, 0.0f));
+    grasses.push_back(new Grass(8.0f, 0.0f));
 
 
 }
@@ -145,20 +146,28 @@ void mouseMovement(int x, int y) {
 static void idle(void)
 {
 
+
     double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
 
-    double deltaT = t - lastTime;
-    lastTime = t;
+        double timestep;
+        if (lastTime == 0.0 || t - lastTime > 1.0)
+            timestep = 0.001;
+        else
+            timestep = t - lastTime;
 
 
-    vector<Grass *>::iterator  iter = grasses.begin();
-    while( iter != grasses.end())
-    {
-        (*iter)->calculate(wind, (float)deltaT);
-        ++iter;
-    }
-   // printf("time: %f\n", deltaT);
+        lastTime = t;
+
+        vector<Grass *>::iterator  iter = grasses.begin();
+        while( iter != grasses.end())
+        {
+            (*iter)->calculate(wind, timestep);
+            ++iter;
+        }
+       // printf("time: %f\n", deltaT);
+
     glutPostRedisplay();
+
 }
 
 int main(int argc, char *argv[])
