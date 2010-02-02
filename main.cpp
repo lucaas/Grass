@@ -48,8 +48,11 @@ static void display(void)
     glLoadIdentity();
     camera.move();
 
-    GLfloat light0_position[] = {5.0, 5.0, 0.0, 1.0};
+    GLfloat light0_position[] = {15.0, 5.0, 15.0, 1.0};
     glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
+    GLint light0_direction[] = {-2, -1, -2};
+
+    glLightiv(GL_LIGHT0, GL_SPOT_DIRECTION, light0_direction);
 
     //Draw plane
     glBegin(GL_QUADS);
@@ -92,6 +95,8 @@ void setupScene()
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
 
+    glLighti(GL_LIGHT0, GL_SPOT_CUTOFF, 45);
+    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.25);
 
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
