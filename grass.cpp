@@ -48,15 +48,18 @@ void Grass::calculate(Vector3f wind, double timestep)
 void Grass::draw()
 {
     glBegin(GL_QUAD_STRIP);
-        glColor3f(0.2f,0.8f,0.2f);
+        glColor3f(0.4f,0.6f,0.4f);
+        glTexCoord2f(0.0f, 0.0f);
         glVertex3f(base.x, base.y, base.z-0.02);
+        glTexCoord2f(1.0f, 0.0f);
         glVertex3f(base.x, base.y, base.z+0.06);
 
         for (int i=0; i < NUM_SEGMENTS; i++)
         {
             Vector3f point = segments[i].getPosition();
+            glTexCoord2f(0.0f, 1.0f);
             glVertex3f(point.x, point.y, point.z);
-
+            glTexCoord2f(1.0f, 1.0f);
             glVertex3f(point.x, point.y, point.z+(NUM_SEGMENTS-i)*0.02);
 
         }

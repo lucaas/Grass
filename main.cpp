@@ -13,6 +13,9 @@
 #include "vmath.h"
 #include "grass.h"
 #include "camera.h"
+#include "BMPLoader.h"
+
+#define TEXTURE_PATH "/home/studenter/marjo424/privat_stuff/Grass/grass.bmp"
 
 using namespace std;
 
@@ -63,7 +66,7 @@ static void display(void)
         glVertex3f( -10.0f, 0.0f, 10.0f);
     glEnd();
 
-    // Draw grasses
+    // Draw grassess
 
     glLineWidth(3);
 
@@ -83,7 +86,7 @@ void setupScene()
 {
 
     //enable lighting
-    glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
 
@@ -108,7 +111,7 @@ void setupScene()
     glClearColor(0.4,0.6,0.9,0.0);
 
     // Populate the vector with Grass objects
-    for (int i=0; i < 10000; i++)
+    for (int i=0; i < 5000; i++)
        grasses.push_back(new Grass());
 
 
@@ -192,6 +195,14 @@ int main(int argc, char *argv[])
     glutMotionFunc(mouseMovement);
     glutMouseFunc(mouseClick);
     glutIdleFunc(idle);
+
+    BMPClass bmp;
+	BMPLoad(TEXTURE_PATH,bmp);
+
+	glEnable(GL_TEXTURE_2D);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D,0,3,bmp.width,bmp.height,0,GL_RGB,GL_UNSIGNED_BYTE,bmp.bytes);
 
     setupScene();
 
