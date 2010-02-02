@@ -1,5 +1,6 @@
 
 #include "segment.h"
+#include <cstdlib>
 
 #define FRICTION 0.99
 #define GRAVITY 9.82
