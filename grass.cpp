@@ -56,19 +56,20 @@ void Grass::draw()
         {
             Vector3f point = segments[i].getPosition();
             glVertex3f(point.x, point.y, point.z);
+
             glVertex3f(point.x, point.y, point.z+(NUM_SEGMENTS-i)*0.02);
 
         }
 
     glEnd();
     glBegin(GL_QUAD_STRIP);
-        glColor3f(0.5f,0.5f,0.5f);
-        glVertex3f(base.x, base.y, base.z);
-        glVertex3f(base.x, base.y, base.z+0.05);
+        glColor3f(0.2f,0.3f,0.1f);
+        glVertex3f(base.x, 0.0001f, base.z-0.02);
+        glVertex3f(base.x, 0.0001f, base.z+0.06);
 
         Vector3f point = segments[2].getPosition();
-        glVertex3f(point.x, 0.0f, point.z);
-        glVertex3f(point.x, 0.0f, point.z+0.01);
+        glVertex3f(point.x, 0.0001f, point.z);
+        glVertex3f(point.x, 0.0001f, point.z+0.02);
 
     glEnd();
     /*glBegin(GL_LINES);

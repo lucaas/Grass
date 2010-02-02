@@ -96,7 +96,7 @@ void setupScene()
     glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
 
     glLighti(GL_LIGHT0, GL_SPOT_CUTOFF, 45);
-    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.25);
+    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
 
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
@@ -105,7 +105,7 @@ void setupScene()
     float emission_color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emission_color);
 
-    glClearColor(0.2,0.2,0.6,0.0);
+    glClearColor(0.4,0.6,0.9,0.0);
 
     // Populate the vector with Grass objects
     for (int i=0; i < 10000; i++)
