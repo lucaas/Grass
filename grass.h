@@ -18,7 +18,7 @@ private:
     Segment segments[NUM_SEGMENTS];
 
     float initialAngle; // Jämviktsläge
-
+    float colorShade;
 
 public:
     Grass();

@@ -23,11 +23,18 @@ void Grass::init(float x, float z)
     base.z = z;
 
     initialAngle = 80.0f + 20.0*(rand()/float(RAND_MAX)); // 80-100 degrees
-	float lengthMultiplier = 0.75 + 0.25*(rand()/float(RAND_MAX)); // 0.75-1 * length
+
+
+    // 0.75- 1.25 * (0.4 + 0.25 + 0.2)
+	float lengthMultiplier = 0.75 + 0.5*(rand()/float(RAND_MAX)); // 0.75-1 * length
 
     segments[0] = Segment(base, initialAngle, lengthMultiplier * 0.4f);
     segments[1] = Segment(segments[0].getPosition(), segments[0].getAngle(), lengthMultiplier * 0.25f);
     segments[2] = Segment(segments[1].getPosition(), segments[1].getAngle(), lengthMultiplier * 0.2f);
+
+
+
+    colorShade = 0.2*rand()/float(RAND_MAX) + 0.65;
 
 
 }
@@ -48,7 +55,9 @@ void Grass::calculate(Vector3f wind, double timestep)
 void Grass::draw()
 {
     glBegin(GL_QUAD_STRIP);
-        glColor3f(0.4f,0.6f,0.4f);
+
+        glColor3f(0.4*colorShade, colorShade, 0.3*colorShade);
+
         glTexCoord2f(0.0f, 0.0f);
         glVertex3f(base.x, base.y, base.z-0.02);
         glTexCoord2f(1.0f, 0.0f);
@@ -57,9 +66,9 @@ void Grass::draw()
         for (int i=0; i < NUM_SEGMENTS; i++)
         {
             Vector3f point = segments[i].getPosition();
-            glTexCoord2f(0.0f, 1.0f);
+            glTexCoord2f(0.0f, 0.33f * (i+1));
             glVertex3f(point.x, point.y, point.z);
-            glTexCoord2f(1.0f, 1.0f);
+            glTexCoord2f(1.0f, 0.33f * (i+1));
             glVertex3f(point.x, point.y, point.z+(NUM_SEGMENTS-i)*0.02);
 
         }

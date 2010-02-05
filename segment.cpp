@@ -2,7 +2,7 @@
 #include "segment.h"
 #include <cstdlib>
 
-#define FRICTION 0.99
+#define FRICTION 0.97
 #define GRAVITY 9.82
 
 
@@ -20,8 +20,8 @@ Segment::Segment(const Vector3f &parent, float parentAngle, float theLength)
 void Segment::init(const Vector3f &parent, float parentAngle, float theLength)
 {
     length = theLength;
-    mass = length * 0.07f;
-    springConstant = 0.02f + 0.01f*rand()/((float)(RAND_MAX));
+    mass = length * 0.01f;
+    springConstant = 0.002f + 0.0001f*rand()/((float)(RAND_MAX));
 
     // Inertia = (0.003g * 0.5m * 0.5m) / 3
     inertia = (mass * length * length) / 3.0f;

@@ -87,13 +87,13 @@ void setupScene()
 {
 
     //enable lighting
-    //glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
 
     GLfloat light0_ambient[] = {0.0, 0.0, 0.0, 1.0};
     GLfloat light0_diffuse[] = {1.0, 1.0, 1.0, 1.0};
-    GLfloat light0_specular[] = {0.0, 0.0, 0.0, 1.0};
+    GLfloat light0_specular[] = {0.25, 0.25, 0.25, 1.0};
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, light0_ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
@@ -112,7 +112,7 @@ void setupScene()
     glClearColor(0.4,0.6,0.9,0.0);
 
     // Populate the vector with Grass objects
-    for (int i=0; i < 5000; i++)
+    for (int i=0; i < 20000; i++)
        grasses.push_back(new Grass());
 
 
@@ -128,9 +128,9 @@ void key (unsigned char key, int x, int y)
     if (key=='u')
         wind.x = 0;
     if (key=='i')
-        wind.x += 0.5;
+        wind.x += 0.05;
     if (key=='k')
-        wind.x -= 0.5;
+        wind.x -= 0.05;
 
     // ESC => Exit
     if (key == 27)
@@ -169,7 +169,7 @@ static void idle(void)
         vector<Grass *>::iterator  iter = grasses.begin();
         while( iter != grasses.end())
         {
-            wind.x += 0.001*rand()/(RAND_MAX) - 0.0005;
+           // wind.x += 0.0001*rand()/(RAND_MAX) - 0.00005;
             (*iter)->calculate(wind, timestep);
             ++iter;
         }
@@ -182,7 +182,7 @@ static void idle(void)
 int main(int argc, char *argv[])
 {
     glutInit(&argc, argv);
-    glutInitWindowSize(640,480);
+    glutInitWindowSize(800, 600);
     glutInitWindowPosition(10,10);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 
@@ -200,9 +200,11 @@ int main(int argc, char *argv[])
     BMPClass bmp;
 	BMPLoad(TEXTURE_PATH,bmp);
 
+
 	glEnable(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); /* or GL_REPLACE */
 	glTexImage2D(GL_TEXTURE_2D,0,3,bmp.width,bmp.height,0,GL_RGB,GL_UNSIGNED_BYTE,bmp.bytes);
 
     setupScene();
