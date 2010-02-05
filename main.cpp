@@ -15,7 +15,8 @@
 #include "camera.h"
 #include "BMPLoader.h"
 
-#define TEXTURE_PATH "/home/studenter/marjo424/privat_stuff/Grass/grass.bmp"
+// the program should be run standing in the source directory
+#define TEXTURE_PATH "data/grass.bmp"
 
 using namespace std;
 
