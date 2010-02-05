@@ -20,7 +20,7 @@
 
 using namespace std;
 
-Vector3f wind = Vector3f(0,0,0);
+Vector3f wind = Vector3f(0,0,0.0);
 double lastTime = 0.0;
 
 vector<Grass *> grasses;
@@ -78,8 +78,6 @@ static void display(void)
         ++iter;
     }
 
-
-
     glutSwapBuffers();
 }
 
@@ -112,8 +110,8 @@ void setupScene()
     glClearColor(0.4,0.6,0.9,0.0);
 
     // Populate the vector with Grass objects
-    for (int i=0; i < 20000; i++)
-       grasses.push_back(new Grass());
+    for (int i=0; i < 1; i++)
+       grasses.push_back(new Grass(0.0f, 0.0f));
 
 
 

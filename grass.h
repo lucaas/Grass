@@ -17,7 +17,8 @@ private:
     Vector3f base;
     Segment segments[NUM_SEGMENTS];
 
-    float initialAngle; // Jämviktsläge
+    float initialAngleXY; // Jämviktsläge
+    float initialAngleZX; // Jämviktsläge
     float colorShade;
 
 public:
