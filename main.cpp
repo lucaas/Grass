@@ -109,6 +109,9 @@ void setupScene()
 
     glClearColor(0.4,0.6,0.9,0.0);
 
+
+
+
     // Populate the vector with Grass objects
     for (int i=0; i < 1; i++)
        grasses.push_back(new Grass(0.0f, 0.0f));
@@ -124,11 +127,16 @@ void key (unsigned char key, int x, int y)
 
     // Wind control
     if (key=='u')
-        wind.x = 0;
+        wind = Vector3f();
     if (key=='i')
         wind.x += 0.05;
     if (key=='k')
         wind.x -= 0.05;
+
+    if (key=='j')
+        wind.z += 0.05;
+    if (key=='l')
+        wind.z -= 0.05;
 
     // ESC => Exit
     if (key == 27)
@@ -179,6 +187,8 @@ static void idle(void)
 
 int main(int argc, char *argv[])
 {
+   srand (time(NULL));
+
     glutInit(&argc, argv);
     glutInitWindowSize(800, 600);
     glutInitWindowPosition(10,10);

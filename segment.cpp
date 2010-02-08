@@ -51,7 +51,8 @@ void Segment::calculatePosition(const Vector3f &wind, const Vector3f &parent, fl
 
     // sin(angleXY) makes it hard to move vertically when grass is close to the ground...
     // but also in the horisontal direction, which we dont want..
-    Vector3f force = wind * sin(DEG2RAD(angleXY));
+   // Vector3f force = wind * sin(DEG2RAD(angleXY));
+    Vector3f force = wind;
     //Vector3f force = wind;
     force.y += -GRAVITY * mass;
 
@@ -75,33 +76,20 @@ void Segment::calculatePosition(const Vector3f &wind, const Vector3f &parent, fl
 
     // troligtvis fuck'd, beräkna själv ist för att copy-paste:a wolfram
     Vector3f tangularZX;
-    tangularZX.x = cos(DEG2RAD(angleZX));
+    tangularZX.x = -1 * cos(DEG2RAD(angleZX));
     tangularZX.y = 0.0f;
-    tangularZX.z = -1 * sin(DEG2RAD(angleZX));
+    tangularZX.z = sin(DEG2RAD(angleZX));
 
-
-
-
-    float cosValueZX = tangularZX.dotProduct(force)/(force.length());
-    if (cosValueZX < -1) cosValueZX = -1;
-    if (cosValueZX >  1) cosValueZX =  1;
-    // fel?
-    float directionZX = (cosValueZX < 0) ? -1: 1;
-    float tangularForceZX = directionZX * force.length() * sqrt(1 - cosValueZX*cosValueZX);
+    float tangularForceZX = tangularZX.dotProduct(force);
 
 
 
     Vector3f tangularXY;
-    tangularXY.x = sin(DEG2RAD(angleZX)) * cos(DEG2RAD(angleXY));
-    tangularXY.y = -1 * sin(DEG2RAD(angleXY));
-    tangularXY.z = cos(DEG2RAD(angleZX)) * cos(DEG2RAD(angleXY));
+    tangularXY.x =  -1 *    sin(DEG2RAD(angleXY)) * sin(DEG2RAD(angleZX));
+    tangularXY.y = -1 * cos(DEG2RAD(angleXY));
+    tangularXY.z =  -1 *    sin(DEG2RAD(angleXY)) * cos(DEG2RAD(angleZX));
 
-    float cosValueXY = tangularXY.dotProduct(force)/(force.length());
-    if (cosValueXY < -1) cosValueXY = -1;
-    if (cosValueXY >  1) cosValueXY =  1;
-    // fel?
-    float directionXY= (cosValueXY < 0) ? -1: 1;
-    float tangularForceXY = directionXY * force.length() * sqrt(1 - cosValueXY*cosValueXY);
+    float tangularForceXY =  tangularXY.dotProduct(force);
 
 
 
@@ -122,12 +110,13 @@ void Segment::calculatePosition(const Vector3f &wind, const Vector3f &parent, fl
     position.y = parent.y + length * sin(DEG2RAD(angleXY));
     position.z = parent.z + length * cos(DEG2RAD(angleXY)) * cos(DEG2RAD(angleZX));
 
-    tangularXY *= tangularForceXY;
-    tangularZX *= tangularForceZX;
+
+  //  tangularXY *= tangularForceXY;
+  //  tangularZX *= tangularForceZX;
     debugLine = position + tangularXY;
     debugLine2 = position + tangularZX;
 
-    printf("angles: %f\n", tauXY-tauZX);
+    printf("angles: %f\n", angleZX);
 
 }
 

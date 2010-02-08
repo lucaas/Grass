@@ -26,7 +26,7 @@ void Grass::init(float x, float z)
 
     initialAngleXY = 80.0f + 20.0*(rand()/float(RAND_MAX)); // 80-100 degrees
     initialAngleZX = 360.0*(rand()/float(RAND_MAX)); // 0-360 degrees
-
+    //initialAngleZX = 180.0f;
 
     // 0.75- 1.25 * (0.4 + 0.25 + 0.2)
 	float lengthMultiplier = 0.75 + 0.5*(rand()/float(RAND_MAX)); // 0.75-1 * length
