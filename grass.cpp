@@ -32,8 +32,8 @@ void Grass::init(float x, float z)
 	float lengthMultiplier = 0.75 + 0.5*(rand()/float(RAND_MAX)); // 0.75-1 * length
 
     segments[0] = Segment(base, initialAngleXY, initialAngleZX, lengthMultiplier * 0.4f);
-    segments[1] = Segment(segments[0].getPosition(), segments[0].getAngleXY(), segments[0].getAngleZX(), lengthMultiplier * 0.25f);
-    segments[2] = Segment(segments[1].getPosition(), segments[1].getAngleXY(), segments[1].getAngleZX(), lengthMultiplier * 0.2f);
+    segments[1] = Segment(segments[0].getPosition(), segments[0].getAngleXY(), initialAngleZX, lengthMultiplier * 0.25f);
+    segments[2] = Segment(segments[1].getPosition(), segments[1].getAngleXY(), initialAngleZX, lengthMultiplier * 0.2f);
 
 
 
@@ -51,19 +51,19 @@ void Grass::calculate(Vector3f wind, double timestep)
 {
     segments[0].calculatePosition(wind, base, initialAngleXY, initialAngleZX, timestep);
     for (int i=1; i < NUM_SEGMENTS; i++)
-        segments[i].calculatePosition(wind, segments[i-1].getPosition(), segments[i-1].getAngleXY(), segments[i-1].getAngleZX(), timestep);
+        segments[i].calculatePosition(wind, segments[i-1].getPosition(), segments[i-1].getAngleXY(), initialAngleZX, timestep);
 
 }
 
 void Grass::draw()
 {
-    /*
+
     glBegin(GL_QUAD_STRIP);
 
         glColor3f(0.4*colorShade, colorShade, 0.3*colorShade);
 
-        float cosVal = BASE_WIDTH * cos(DEG2RAD(initialAngleZX));
-        float sinVal = BASE_WIDTH * sin(DEG2RAD(initialAngleZX));
+        float sinVal = BASE_WIDTH * cos(DEG2RAD(initialAngleZX));
+        float cosVal = BASE_WIDTH * sin(DEG2RAD(initialAngleZX));
 
         glTexCoord2f(0.0f, 0.0f);
         glVertex3f(base.x - 0.5*sinVal, base.y, base.z - 0.5*cosVal);
@@ -87,8 +87,8 @@ void Grass::draw()
 
     glEnd();
 
-    */
 
+/*
     glLineWidth(3.0);
     glBegin(GL_LINE_STRIP);
         glColor3f(0.0f, 1.0, 0.0f);
@@ -112,7 +112,7 @@ void Grass::draw()
 
     for (int i=0; i < NUM_SEGMENTS; i++)
         segments[i].drawLine();
-/*
+*/
     glBegin(GL_QUAD_STRIP);
         glColor3f(0.2f,0.3f,0.1f);
         glVertex3f(base.x - 0.5*sinVal, 0.0001f, base.z - 0.5*cosVal);
@@ -123,7 +123,7 @@ void Grass::draw()
         glVertex3f(point.x + 0.5*sinVal, 0.0001f, point.z + 0.5*cosVal);
 
     glEnd();
-    */
+
     /*glBegin(GL_LINES);
         glColor3f(1.0,1.0,0.0);
         glVertex3f(points[0][0], points[0][1], points[0][2]);

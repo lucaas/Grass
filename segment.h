@@ -11,7 +11,8 @@ class Segment
 private:
     Vector3f position;
     float inertia;
-    float springConstant;
+    float springConstantXY;
+    float springConstantZX;
     float length;
     float mass;
 

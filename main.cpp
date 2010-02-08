@@ -113,8 +113,8 @@ void setupScene()
 
 
     // Populate the vector with Grass objects
-    for (int i=0; i < 1; i++)
-       grasses.push_back(new Grass(0.0f, 0.0f));
+    for (int i=0; i < 100; i++)
+       grasses.push_back(new Grass());
 
 
 
@@ -125,22 +125,26 @@ void key (unsigned char key, int x, int y)
 {
     camera.key(key, x, y);
 
-    // Wind control
-    if (key=='u')
-        wind = Vector3f();
-    if (key=='i')
-        wind.x += 0.05;
-    if (key=='k')
-        wind.x -= 0.05;
+    printf("wind: %f\t%f\n", wind.x, wind.z);
 
-    if (key=='j')
-        wind.z += 0.05;
-    if (key=='l')
-        wind.z -= 0.05;
+    // Wind control
+    if (key=='0')
+        wind = Vector3f();
+    if (key=='4' && wind.x < 10)
+        wind.x += 0.1;
+    if (key=='6' && wind.x > -10)
+        wind.x -= 0.1;
+
+    if (key=='8' && wind.z < 10)
+        wind.z += 0.1;
+    if (key=='2' && wind.z > -10)
+        wind.z -= 0.1;
 
     // ESC => Exit
     if (key == 27)
         exit(0);
+
+
 
 
 }
@@ -175,7 +179,8 @@ static void idle(void)
         vector<Grass *>::iterator  iter = grasses.begin();
         while( iter != grasses.end())
         {
-           // wind.x += 0.0001*rand()/(RAND_MAX) - 0.00005;
+            wind.x += 0.0001*rand()/(RAND_MAX) - 0.00005;
+            wind.z += 0.0001*rand()/(RAND_MAX) - 0.00005;
             (*iter)->calculate(wind, timestep);
             ++iter;
         }

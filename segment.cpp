@@ -26,7 +26,9 @@ void Segment::init(const Vector3f &parent, float parentAngleXY, float parentAngl
 {
     length = theLength;
     mass = length * 0.01f;
-    springConstant = 0.002f + 0.0001f*rand()/((float)(RAND_MAX));
+
+    springConstantXY = length*0.04f + 0.00001f*rand()/((float)(RAND_MAX));
+    springConstantZX = length*0.01f;
 
     // Inertia = (0.003g * 0.5m * 0.5m) / 3
     inertia = (mass * length * length) / 3.0f;
@@ -51,8 +53,8 @@ void Segment::calculatePosition(const Vector3f &wind, const Vector3f &parent, fl
 
     // sin(angleXY) makes it hard to move vertically when grass is close to the ground...
     // but also in the horisontal direction, which we dont want..
-   // Vector3f force = wind * sin(DEG2RAD(angleXY));
-    Vector3f force = wind;
+    Vector3f force = wind * sin(DEG2RAD(angleXY));
+   // Vector3f force = wind;
     //Vector3f force = wind;
     force.y += -GRAVITY * mass;
 
@@ -93,21 +95,33 @@ void Segment::calculatePosition(const Vector3f &wind, const Vector3f &parent, fl
 
 
 
-    float tauXY = (length/2.0)*tangularForceXY - springConstant*(angleXY - parentAngleXY);
+
+    float tauXY = (length/2.0)*tangularForceXY - springConstantXY*(angleXY - parentAngleXY);
     angularVelocityXY = angularVelocityXY + (1.0f/inertia)*tauXY*timestep;
     angularVelocityXY *= FRICTION;
     angleXY = angleXY + angularVelocityXY*timestep;
 
+    float angleDiff;
+    if ((angleZX - parentAngleZX) < -180)
+        angleDiff = (angleZX - parentAngleZX) + 360;
+    else if ((angleZX - parentAngleZX) < 180)
+        angleDiff = (angleZX - parentAngleZX);
+    else
+        angleDiff = (angleZX - parentAngleZX) - 360;
 
-    float tauZX = (length/2.0)*tangularForceZX - springConstant*(angleZX - parentAngleZX);
+
+    float tauZX = (length/2.0)*tangularForceZX - springConstantZX*(angleDiff);
 
     angularVelocityZX = angularVelocityZX + (1.0f/inertia)*tauZX*timestep;
     angularVelocityZX *= FRICTION;
     angleZX = angleZX + angularVelocityZX*timestep;
 
+    angleZX  = (angleZX > 360) ? angleZX - 360 : angleZX;
+    angleZX  = (angleZX < 0) ? 0 - angleZX : angleZX;
+
 
     position.x = parent.x + length * cos(DEG2RAD(angleXY)) * sin(DEG2RAD(angleZX));
-    position.y = parent.y + length * sin(DEG2RAD(angleXY));
+    position.y = parent.y + length * sin(DEG2RAD(angleXY)) ;
     position.z = parent.z + length * cos(DEG2RAD(angleXY)) * cos(DEG2RAD(angleZX));
 
 
@@ -115,8 +129,6 @@ void Segment::calculatePosition(const Vector3f &wind, const Vector3f &parent, fl
   //  tangularZX *= tangularForceZX;
     debugLine = position + tangularXY;
     debugLine2 = position + tangularZX;
-
-    printf("angles: %f\n", angleZX);
 
 }
 
