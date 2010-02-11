@@ -113,7 +113,7 @@ void setupScene()
 
 
     // Populate the vector with Grass objects
-    for (int i=0; i < 100; i++)
+    for (int i=0; i < 5000; i++)
        grasses.push_back(new Grass());
 
 

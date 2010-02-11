@@ -9,7 +9,7 @@
 #include <math.h>
 #include "segment.h"
 
-#define NUM_SEGMENTS 3
+#define NUM_SEGMENTS 5
 
 class Grass
 {
