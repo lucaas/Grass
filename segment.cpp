@@ -60,6 +60,7 @@ void Segment::calculatePosition(float windAngle, float windMagnitude, const Vect
     Vector3f wind = Vector3f(windMagnitude * cos(DEG2RAD(windAngle)), 0.0f, windMagnitude * sin(DEG2RAD(windAngle)));
 
     Vector3f force = wind * sin(DEG2RAD(angleXY));
+
    // Vector3f force = wind;
     //Vector3f force = wind;
     force.y += -GRAVITY * mass;
@@ -68,9 +69,9 @@ void Segment::calculatePosition(float windAngle, float windMagnitude, const Vect
 
 
     Vector3f tangularXY;
-    tangularXY.x =  -1 *    sin(DEG2RAD(angleXY)) * sin(DEG2RAD(windAngle));
-     tangularXY.y = -1 * cos(DEG2RAD(angleXY));
-   tangularXY.z =  -1 *    sin(DEG2RAD(angleXY)) * cos(DEG2RAD(windAngle));
+    tangularXY.x =  -1 *    sin(DEG2RAD(angleXY)) * cos(DEG2RAD(windAngle));
+    tangularXY.y = -1 * cos(DEG2RAD(angleXY));
+    tangularXY.z =  -1 *    sin(DEG2RAD(angleXY)) * sin(DEG2RAD(windAngle));
 
 
     float tangularForceXY =  tangularXY.dotProduct(force);

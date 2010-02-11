@@ -11,9 +11,9 @@
 Camera::Camera()
 {
     xpos = 0;
-    ypos = 0;
-    zpos = 3;
-    xrot = 0;
+    ypos = 3;
+    zpos = 15;
+    xrot = 20;
     yrot = 0;
 }
 
