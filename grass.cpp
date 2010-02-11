@@ -117,14 +117,18 @@ void Grass::draw()
     for (int i=0; i < NUM_SEGMENTS; i++)
         segments[i].drawLine();
 */
+    //Ritar ut skuggor till gräset
     glBegin(GL_QUAD_STRIP);
         glColor3f(0.2f,0.3f,0.1f);
         glVertex3f(base.x - 0.5*sinVal, 0.0001f, base.z - 0.5*cosVal);
         glVertex3f(base.x + 0.5*sinVal, 0.0001f, base.z + 0.5*cosVal);
 
-        Vector3f point = segments[2].getPosition();
-        glVertex3f(point.x - 0.5*sinVal, 0.0001f, point.z - 0.5*cosVal);
-        glVertex3f(point.x + 0.5*sinVal, 0.0001f, point.z + 0.5*cosVal);
+        Vector3f point = segments[NUM_SEGMENTS-1].getPosition();
+        float sinVal2 = 0.5f*sinVal + 0.5f*BASE_WIDTH * cos(DEG2RAD(segments[NUM_SEGMENTS-1].getAngleZX()));
+        float cosVal2 = 0.5f*cosVal + 0.5f*BASE_WIDTH * sin(DEG2RAD(segments[NUM_SEGMENTS-1].getAngleZX()));
+
+        glVertex3f(point.x - 0.5*sinVal2, 0.0001f, point.z - 0.5*cosVal2);
+        glVertex3f(point.x + 0.5*sinVal2, 0.0001f, point.z + 0.5*cosVal2);
 
     glEnd();
 
