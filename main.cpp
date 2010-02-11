@@ -180,6 +180,7 @@ static void idle(void)
         vector<Grass *>::iterator  iter = grasses.begin();
         while( iter != grasses.end())
         {
+            //Lägger på randomtal på vindstyrkan
             windMagnitude += 0.00025 - 0.0005*rand()/(RAND_MAX);
 
             (*iter)->calculate(windAngle, windMagnitude, timestep);

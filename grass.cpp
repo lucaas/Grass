@@ -60,6 +60,7 @@ void Grass::draw()
 
     glBegin(GL_QUAD_STRIP);
 
+        //Ritar ut första segmentet
         glColor3f(0.4*colorShade, colorShade, 0.3*colorShade);
 
         float sinVal = BASE_WIDTH * sin(DEG2RAD(initialAngleZX));
@@ -70,6 +71,8 @@ void Grass::draw()
         glTexCoord2f(1.0f, 0.0f);
         glVertex3f(base.x + 0.5*cosVal, base.y, base.z + 0.5*sinVal);
 
+
+        //Ritar ut resten segmenten
         for (int i=0; i < NUM_SEGMENTS; i++)
         {
 
@@ -83,58 +86,23 @@ void Grass::draw()
 
             glTexCoord2f(1.0f, (1.0f/NUM_SEGMENTS) * (i+1));
             glVertex3f(point.x + 0.5*cosVal2, point.y, point.z + 0.5*sinVal2);
-
-
-
         }
 
 
     glEnd();
 
-
-/*
-    glLineWidth(3.0);
-    glBegin(GL_LINE_STRIP);
-        glColor3f(0.0f, 1.0, 0.0f);
-        glVertex3f(base.x, base.y, base.z);
-        for (int i=0; i < NUM_SEGMENTS; i++)
-        {
-            Vector3f point = segments[i].getPosition();
-            glVertex3f(point.x, point.y, point.z);
-        }
-
-    glEnd();
-
-    glBegin(GL_LINES);
-        glColor3f(0.0f, 0.0, 0.0f);
-        Vector3f point = segments[2].getPosition();
-        glVertex3f(base.x, base.y, base.z);
-        glVertex3f(point.x, 0.0001f, point.z);
-
-
-    glEnd();
-
-    for (int i=0; i < NUM_SEGMENTS; i++)
-        segments[i].drawLine();
-*/
     //Ritar ut skuggor till gräset
     glBegin(GL_QUAD_STRIP);
         glColor3f(0.2f,0.3f,0.1f);
-        glVertex3f(base.x - 0.5*sinVal, 0.0001f, base.z - 0.5*cosVal);
-        glVertex3f(base.x + 0.5*sinVal, 0.0001f, base.z + 0.5*cosVal);
+        glVertex3f(base.x - 0.5*cosVal, 0.0001f, base.z - 0.5*sinVal);
+        glVertex3f(base.x + 0.5*cosVal, 0.0001f, base.z + 0.5*sinVal);
 
         Vector3f point = segments[NUM_SEGMENTS-1].getPosition();
         float sinVal2 = 0.5f*sinVal + 0.5f*BASE_WIDTH * cos(DEG2RAD(segments[NUM_SEGMENTS-1].getAngleZX()));
         float cosVal2 = 0.5f*cosVal + 0.5f*BASE_WIDTH * sin(DEG2RAD(segments[NUM_SEGMENTS-1].getAngleZX()));
 
-        glVertex3f(point.x - 0.5*sinVal2, 0.0001f, point.z - 0.5*cosVal2);
-        glVertex3f(point.x + 0.5*sinVal2, 0.0001f, point.z + 0.5*cosVal2);
+        glVertex3f(point.x - 0.5*cosVal2, 0.0001f, point.z - 0.5*sinVal2);
+        glVertex3f(point.x + 0.5*cosVal2, 0.0001f, point.z + 0.5*sinVal2);
 
     glEnd();
-
-    /*glBegin(GL_LINES);
-        glColor3f(1.0,1.0,0.0);
-        glVertex3f(points[0][0], points[0][1], points[0][2]);
-        glVertex3f(points[0][0] + radius[0]*cos(theta0*(3.14159f/180.0f)), points[0][1] + radius[0]*sin(theta0*(3.14159f/180.0f)), points[0][2]);
-    glEnd();*/
 }
