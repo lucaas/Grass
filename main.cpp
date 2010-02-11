@@ -20,7 +20,8 @@
 
 using namespace std;
 
-Vector3f wind = Vector3f(0,0,0.0);
+float windAngle = 0.0f;
+float windMagnitude = 0.0f;
 double lastTime = 0.0;
 
 vector<Grass *> grasses;
@@ -125,20 +126,20 @@ void key (unsigned char key, int x, int y)
 {
     camera.key(key, x, y);
 
-    printf("wind: %f\t%f\n", wind.x, wind.z);
+    printf("wind: %f\t%f\n", windAngle, windMagnitude);
 
     // Wind control
     if (key=='0')
-        wind = Vector3f();
-    if (key=='4' && wind.x < 10)
-        wind.x += 0.1;
-    if (key=='6' && wind.x > -10)
-        wind.x -= 0.1;
+        windMagnitude = 0;
+    if (key=='8' && windMagnitude < 10)
+        windMagnitude += 0.1;
+    if (key=='2' && windMagnitude > -10)
+        windMagnitude -= 0.1;
 
-    if (key=='8' && wind.z < 10)
-        wind.z += 0.1;
-    if (key=='2' && wind.z > -10)
-        wind.z -= 0.1;
+    if (key=='4')
+        windAngle += 10;
+    if (key=='6')
+        windAngle -= 10;
 
     // ESC => Exit
     if (key == 27)
@@ -179,9 +180,9 @@ static void idle(void)
         vector<Grass *>::iterator  iter = grasses.begin();
         while( iter != grasses.end())
         {
-            wind.x += 0.0001*rand()/(RAND_MAX) - 0.00005;
-            wind.z += 0.0001*rand()/(RAND_MAX) - 0.00005;
-            (*iter)->calculate(wind, timestep);
+            windMagnitude += 0.0001*rand()/(RAND_MAX) - 0.00005;
+
+            (*iter)->calculate(windAngle, windMagnitude, timestep);
             ++iter;
         }
        // printf("time: %f\n", deltaT);

@@ -52,11 +52,13 @@ void Segment::init(const Vector3f &parent, float parentAngleXY, float parentAngl
 
 }
 
-void Segment::calculatePosition(const Vector3f &wind, const Vector3f &parent, float parentAngleXY, float parentAngleZX, double timestep)
+void Segment::calculatePosition(float windAngle, float windMagnitude, const Vector3f &parent, float parentAngleXY, float parentAngleZX, double timestep)
 {
 
     // sin(angleXY) makes it hard to move vertically when grass is close to the ground...
     // but also in the horisontal direction, which we dont want..
+    Vector3f wind = Vector3f(windMagnitude * cos(DEG2RAD(windAngle)), 0.0f, windMagnitude * sin(DEG2RAD(windAngle)));
+
     Vector3f force = wind * sin(DEG2RAD(angleXY));
    // Vector3f force = wind;
     //Vector3f force = wind;
@@ -66,9 +68,10 @@ void Segment::calculatePosition(const Vector3f &wind, const Vector3f &parent, fl
 
 
     Vector3f tangularXY;
-    tangularXY.x =  -1 *    sin(DEG2RAD(angleXY)) ;
-    tangularXY.y = -1 * cos(DEG2RAD(angleXY));
-    tangularXY.z =  -1 *    sin(DEG2RAD(angleXY));
+    tangularXY.x =  -1 *    sin(DEG2RAD(angleXY)) * sin(DEG2RAD(windAngle));
+     tangularXY.y = -1 * cos(DEG2RAD(angleXY));
+   tangularXY.z =  -1 *    sin(DEG2RAD(angleXY)) * cos(DEG2RAD(windAngle));
+
 
     float tangularForceXY =  tangularXY.dotProduct(force);
 
@@ -77,10 +80,13 @@ void Segment::calculatePosition(const Vector3f &wind, const Vector3f &parent, fl
     angularVelocityXY *= FRICTION;
     angleXY = angleXY + angularVelocityXY*timestep;
 
+    angleZX += 0.1*(windAngle - angleZX);
 
-    position.x = parent.x + length * cos(DEG2RAD(angleXY));
+    float angle = 90.0f;
+
+    position.x = parent.x + length * cos(DEG2RAD(angleXY)) * sin(DEG2RAD(angleZX));
     position.y = parent.y + length * sin(DEG2RAD(angleXY));
-    position.z = parent.z + length * cos(DEG2RAD(angleXY));
+    position.z = parent.z + length * cos(DEG2RAD(angleXY)) * cos(DEG2RAD(angleZX));
 
 
 

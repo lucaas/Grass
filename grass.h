@@ -9,7 +9,7 @@
 #include <math.h>
 #include "segment.h"
 
-#define NUM_SEGMENTS 5
+#define NUM_SEGMENTS 3
 
 class Grass
 {
@@ -29,5 +29,5 @@ public:
     ~Grass();
 
     void draw();
-    void calculate(Vector3f wind, double timestep);
+    void calculate(float windAngle,float windMagnitude, double timestep);
 };

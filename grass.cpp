@@ -47,11 +47,11 @@ Grass::~Grass()
     delete segments;
 }
 
-void Grass::calculate(Vector3f wind, double timestep)
+void Grass::calculate(float windAngle,float windMagnitude, double timestep)
 {
-    segments[0].calculatePosition(wind, base, initialAngleXY, initialAngleZX, timestep);
+    segments[0].calculatePosition(windAngle, windMagnitude, base, initialAngleXY, initialAngleZX, timestep);
     for (int i=1; i < NUM_SEGMENTS; i++)
-        segments[i].calculatePosition(wind, segments[i-1].getPosition(), segments[i-1].getAngleXY(), initialAngleZX, timestep);
+        segments[i].calculatePosition(windAngle, windMagnitude, segments[i-1].getPosition(), segments[i-1].getAngleXY(), initialAngleZX, timestep);
 
 }
 
@@ -62,23 +62,27 @@ void Grass::draw()
 
         glColor3f(0.4*colorShade, colorShade, 0.3*colorShade);
 
-        float sinVal = BASE_WIDTH * cos(DEG2RAD(initialAngleZX));
-        float cosVal = BASE_WIDTH * sin(DEG2RAD(initialAngleZX));
+        float sinVal = BASE_WIDTH * sin(DEG2RAD(initialAngleZX));
+        float cosVal = BASE_WIDTH * cos(DEG2RAD(initialAngleZX));
 
         glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(base.x - 0.5*sinVal, base.y, base.z - 0.5*cosVal);
+        glVertex3f(base.x - 0.5*cosVal, base.y, base.z - 0.5*sinVal);
         glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(base.x + 0.5*sinVal, base.y, base.z + 0.5*cosVal);
+        glVertex3f(base.x + 0.5*cosVal, base.y, base.z + 0.5*sinVal);
 
         for (int i=0; i < NUM_SEGMENTS; i++)
         {
+
+            float sinVal2 = 0.5f*sinVal + 0.5f*BASE_WIDTH * cos(DEG2RAD(segments[i].getAngleZX()));
+            float cosVal2 = 0.5f*cosVal + 0.5f*BASE_WIDTH * sin(DEG2RAD(segments[i].getAngleZX()));
+
             Vector3f point = segments[i].getPosition();
 
             glTexCoord2f(0.0f, (1.0f/NUM_SEGMENTS) * (i+1));
-            glVertex3f(point.x - 0.5*sinVal, point.y, point.z - 0.5*cosVal);
+            glVertex3f(point.x - 0.5*cosVal2, point.y, point.z - 0.5*sinVal2);
 
             glTexCoord2f(1.0f, (1.0f/NUM_SEGMENTS) * (i+1));
-            glVertex3f(point.x + 0.5*sinVal, point.y, point.z + 0.5*cosVal);
+            glVertex3f(point.x + 0.5*cosVal2, point.y, point.z + 0.5*sinVal2);
 
 
 
