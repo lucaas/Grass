@@ -86,6 +86,11 @@ void Camera::mouseClick(int button, int state, int x, int y) {
     }
 }
 
+Vector3f Camera::getPosition()
+{
+    return Vector3f(xpos, ypos, zpos);
+}
+
 void Camera::mouseMovement(int x, int y) {
     int diffx=x-lastx; //check the difference between the current x and the last x position
     int diffy=y-lasty; //check the difference between the current y and the last y position

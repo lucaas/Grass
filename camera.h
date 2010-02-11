@@ -6,6 +6,8 @@
 #ifndef __CAMERA_H__
 #define __CAMERA_H__
 
+#include "vmath.h"
+
 class Camera
 {
 private:
@@ -23,6 +25,7 @@ public:
     void key (unsigned char key, int x, int y);
     void mouseClick(int button, int state, int x, int y);
     void mouseMovement(int x, int y);
+    Vector3f getPosition();
 
 };
 #endif
