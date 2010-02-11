@@ -17,7 +17,7 @@
 
 
   cjbackhouse@hotmail.com 		www.backhouse.tk
-  
+
   I would appreciate it if anyone using this in something cool would tell me
   so I can see where it ends up.
 
@@ -29,7 +29,7 @@
   2 colour bitmaps  (Thanks to Charles Rabier)
 
   This code is designed for use in openGL programs, so bitmaps not correctly padded will not
-  load properly, I believe this only applies to: 
+  load properly, I believe this only applies to:
   256cols if width is not a multiple of 4
   16cols if width is not a multiple of 8
   2cols if width is not a multiple of 32
@@ -47,7 +47,7 @@
 BMPClass::BMPClass(){bytes=0;}
 BMPClass::~BMPClass(){delete[] bytes;}
 BYTE& BMPClass::pixel(int x,int y,int c){return bytes[(y*width+x)*3+c];}
-void BMPClass::allocateMem(){delete[] bytes;bytes=new BYTE[width*height*3];}
+void BMPClass::allocateMem(){delete[] bytes;bytes=new BYTE[width*height*4];}
 
 std::string TranslateBMPError(BMPError err)
 {
@@ -73,13 +73,13 @@ std::string TranslateBMPError(BMPError err)
 BMPError BMPLoad(std::string fname,BMPClass& bmp)
 {
 	if(sizeof(int)!=4) return BMPBADINT;
-		
+
 	FILE* f=fopen(fname.c_str(),"rb");		//open for reading in binary mode
 	if(!f) return BMPNOOPEN;
 	char header[54];
 	fread(header,54,1,f);			//read the 54bit main header
 
-	if(header[0]!='B' || header[1]!='M') 
+	if(header[0]!='B' || header[1]!='M')
 	{
 		fclose(f);
 		return BMPNOTABITMAP;		//all bitmaps should start "BM"
@@ -87,18 +87,38 @@ BMPError BMPLoad(std::string fname,BMPClass& bmp)
 
 	//it seems gimp sometimes makes its headers small, so we have to do this. hence all the fseeks
 	int offset=*(unsigned int*)(header+10);
-	
+
 	bmp.width=*(int*)(header+18);
 	bmp.height=*(int*)(header+22);
 	//now the bitmap knows how big it is it can allocate its memory
 	bmp.allocateMem();
 
 	int bits=int(header[28]);		//colourdepth
-
 	int x,y,c;
 	BYTE cols[256*4];				//colourtable
 	switch(bits)
 	{
+    case(32):
+		fseek(f,offset,SEEK_SET);
+		fread(bmp.bytes,bmp.width*bmp.height*4,1,f);	//24bit is easy
+
+		for(x=0;x<bmp.width*bmp.height*4;x+=4)			//except the format is BGR, grr
+		{
+			BYTE Blue=bmp.bytes[x];
+            BYTE Green=bmp.bytes[x+1];
+			BYTE Red=bmp.bytes[x+2];
+			BYTE Alpha=bmp.bytes[x+3];
+
+			bmp.bytes[x] = Red;
+			bmp.bytes[x+1] = Green;
+			bmp.bytes[x+2] = Blue;
+			bmp.bytes[x+3] = Alpha;
+
+			//printf("RGBA: %d\t%d\t%d\t%d\n", Red, Green, Blue, Alpha);
+		}
+
+
+		break;
 	case(24):
 		fseek(f,offset,SEEK_SET);
 		fread(bmp.bytes,bmp.width*bmp.height*3,1,f);	//24bit is easy
@@ -116,8 +136,8 @@ BMPError BMPLoad(std::string fname,BMPClass& bmp)
 		for(y=0;y<bmp.height;++y)						//(Notice 4bytes/col for some reason)
 			for(x=0;x<bmp.width;++x)
 			{
-				BYTE byte;			
-				fread(&byte,1,1,f);						//just read byte					
+				BYTE byte;
+				fread(&byte,1,1,f);						//just read byte
 				for(int c=0;c<3;++c)
 					bmp.pixel(x,y,c)=cols[byte*4+2-c];	//and look up in the table
 			}
@@ -165,7 +185,7 @@ BMPError BMPLoad(std::string fname,BMPClass& bmp)
 		fclose(f);
 		return BMPFILEERROR;
 	}
-	
+
 	fclose(f);
 
 	return BMPNOERROR;
@@ -179,7 +199,7 @@ BMPError BMPLoadGL(std::string fname)
 	BMPClass bmp;
 	BMPError e=BMPLoad(fname,bmp);
 	if(e!=BMPNOERROR) return e;
-		
+
 	glEnable(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);

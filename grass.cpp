@@ -81,10 +81,10 @@ void Grass::draw()
 
             Vector3f point = segments[i].getPosition();
 
-            glTexCoord2f(0.0f, (1.0f/NUM_SEGMENTS) * (i+1));
+            glTexCoord2f(0.0f, (0.99f/NUM_SEGMENTS) * (i+1));
             glVertex3f(point.x - 0.5*cosVal2, point.y, point.z - 0.5*sinVal2);
 
-            glTexCoord2f(1.0f, (1.0f/NUM_SEGMENTS) * (i+1));
+            glTexCoord2f(1.0f, (0.99f/NUM_SEGMENTS) * (i+1));
             glVertex3f(point.x + 0.5*cosVal2, point.y, point.z + 0.5*sinVal2);
         }
 
@@ -92,6 +92,7 @@ void Grass::draw()
     glEnd();
 
     //Ritar ut skuggor till gräset
+    glDisable(GL_TEXTURE_2D);
     glBegin(GL_QUAD_STRIP);
         glColor3f(0.2f,0.3f,0.1f);
         glVertex3f(base.x - 0.5*cosVal, 0.0001f, base.z - 0.5*sinVal);
@@ -105,4 +106,6 @@ void Grass::draw()
         glVertex3f(point.x + 0.5*cosVal2, 0.0001f, point.z + 0.5*sinVal2);
 
     glEnd();
+    glEnable(GL_TEXTURE_2D);
+
 }

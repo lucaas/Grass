@@ -16,7 +16,7 @@
 #include "BMPLoader.h"
 
 // the program should be run standing in the source directory
-#define TEXTURE_PATH "data/grass.bmp"
+#define TEXTURE_PATH "data/alfa.bmp"
 
 using namespace std;
 
@@ -60,6 +60,7 @@ static void display(void)
     glLightiv(GL_LIGHT0, GL_SPOT_DIRECTION, light0_direction);
 
     //Draw plane
+    glDisable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
         glColor3f(0.3f,0.5f,0.2f);
         glVertex3f( -10.0f, 0.0f, -10.0f);
@@ -67,6 +68,8 @@ static void display(void)
         glVertex3f( 10.0f, 0.0f, 10.0f);
         glVertex3f( -10.0f, 0.0f, 10.0f);
     glEnd();
+    glEnable(GL_TEXTURE_2D);
+
 
     // Draw grassess
 
@@ -221,6 +224,9 @@ int main(int argc, char *argv[])
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); /* or GL_REPLACE */
 	glTexImage2D(GL_TEXTURE_2D,0,3,bmp.width,bmp.height,0,GL_RGB,GL_UNSIGNED_BYTE,bmp.bytes);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,bmp.width,bmp.height,0,GL_RGBA,GL_UNSIGNED_BYTE,bmp.bytes);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     setupScene();
 
