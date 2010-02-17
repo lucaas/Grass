@@ -191,6 +191,7 @@ void key (unsigned char key, int x, int y)
     if (key=='6')
         windAngle -= 10;
 
+    //Välj vindtyp.. Fixa lite Radiobuttons eller ngt
     if (key=='h')
         windType = HELICOPTER;
     if (key=='t')
@@ -264,6 +265,7 @@ static void idle(void)
 
 }
 
+//Beräkna vindens riktning och styrka för varje grässtrå
 Vector2f calculateWindAngle(Vector2f base)
 {
     if(windType == HELICOPTER)
