@@ -31,4 +31,6 @@ public:
 
     void draw();
     void calculate(float windAngle,float windMagnitude, double timestep);
+    Vector3f getPosition() const { return segments[0].getPosition(); }
+
 };

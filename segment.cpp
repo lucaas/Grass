@@ -97,11 +97,6 @@ void Segment::calculatePosition(float windAngle, float windMagnitude, const Vect
 
 }
 
-Vector3f Segment::getPosition()
-{
-    return position;
-}
-
 
 float Segment::getAngleXY()
 {

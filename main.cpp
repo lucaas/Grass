@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include <vector>
+#include <algorithm>
 
 #include "vmath.h"
 #include "grass.h"
@@ -31,7 +32,11 @@ vector<Grass *> grasses;
 
 Camera camera;
 
+
 Vector2f calculateWindAngle(Vector2f base);
+
+bool compare(const Grass *a, const Grass *b);
+
 
 /* GLUT callback Handlers */
 static void resize(int width, int height)
@@ -78,6 +83,9 @@ static void display(void)
 
     glLineWidth(3);
 
+
+
+
     vector<Grass *>::iterator  iter = grasses.begin();
     while( iter != grasses.end())
     {
@@ -85,16 +93,22 @@ static void display(void)
         ++iter;
     }
 
+
+
+
+
     glutSwapBuffers();
 }
 
 void setupScene()
 {
 
+
     //enable lighting
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
 
     GLfloat light0_ambient[] = {0.0, 0.0, 0.0, 1.0};
     GLfloat light0_diffuse[] = {1.0, 1.0, 1.0, 1.0};
@@ -114,16 +128,36 @@ void setupScene()
     float emission_color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emission_color);
 
+    // alpha blending
+    glEnable(GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+    // texture
+    BMPClass bmp;
+	BMPLoad(TEXTURE_PATH,bmp);
+
+
+	glEnable(GL_TEXTURE_2D);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); /* or GL_REPLACE */
+	glTexImage2D(GL_TEXTURE_2D,0,3,bmp.width,bmp.height,0,GL_RGB,GL_UNSIGNED_BYTE,bmp.bytes);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,bmp.width,bmp.height,0,GL_RGBA,GL_UNSIGNED_BYTE,bmp.bytes);
+
+
+
+
     glClearColor(0.4,0.6,0.9,0.0);
 
 
 
 
     // Populate the vector with Grass objects
-    for (int i=0; i < 5000; i++)
+    for (int i=0; i < 10000; i++)
        grasses.push_back(new Grass());
 
-
+    sort(grasses.begin(), grasses.end(), compare);
 
 }
 
@@ -131,6 +165,11 @@ void setupScene()
 void key (unsigned char key, int x, int y)
 {
     camera.key(key, x, y);
+
+    // kolla om kamera-key tryckt, sortera om vektorn
+    sort(grasses.begin(), grasses.end(), compare);
+
+
 
     printf("wind: %f\t%f\n", windAngle, windMagnitude);
 
@@ -272,18 +311,7 @@ int main(int argc, char *argv[])
     glutMouseFunc(mouseClick);
     glutIdleFunc(idle);
 
-    BMPClass bmp;
-	BMPLoad(TEXTURE_PATH,bmp);
 
-
-	glEnable(GL_TEXTURE_2D);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); /* or GL_REPLACE */
-	glTexImage2D(GL_TEXTURE_2D,0,3,bmp.width,bmp.height,0,GL_RGB,GL_UNSIGNED_BYTE,bmp.bytes);
-	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,bmp.width,bmp.height,0,GL_RGBA,GL_UNSIGNED_BYTE,bmp.bytes);
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     setupScene();
 
@@ -291,3 +319,16 @@ int main(int argc, char *argv[])
 
     return EXIT_SUCCESS;
 }
+
+
+bool compare(const Grass *a, const Grass *b)
+{
+
+    Vector3f cameraPos = camera.getPosition();
+    Vector3f aDiff = a->getPosition() - cameraPos;
+    Vector3f bDiff = b->getPosition() - cameraPos;
+
+    return aDiff.lengthSq() > bDiff.lengthSq();
+
+}
+
