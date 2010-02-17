@@ -63,6 +63,7 @@ void Grass::draw()
         //Ritar ut första segmentet
         glColor3f(0.4*colorShade, colorShade, 0.3*colorShade);
 
+
         float sinVal = BASE_WIDTH * sin(DEG2RAD(initialAngleZX));
         float cosVal = BASE_WIDTH * cos(DEG2RAD(initialAngleZX));
 
@@ -94,7 +95,7 @@ void Grass::draw()
     //Ritar ut skuggor till gräset
     glDisable(GL_TEXTURE_2D);
     glBegin(GL_QUAD_STRIP);
-        glColor3f(0.2f,0.3f,0.1f);
+        glColor3f(0.3f,0.5f,0.2f);
         glVertex3f(base.x - 0.5*cosVal, 0.0001f, base.z - 0.5*sinVal);
         glVertex3f(base.x + 0.5*cosVal, 0.0001f, base.z + 0.5*sinVal);
 
@@ -109,3 +110,5 @@ void Grass::draw()
     glEnable(GL_TEXTURE_2D);
 
 }
+
+

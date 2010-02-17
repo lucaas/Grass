@@ -30,9 +30,10 @@ public:
     Segment(const Vector3f &parent, float parentAngleXY, float parentAngleZX, float theLength = 0.3f);
     void init(const Vector3f &parent, float parentAngleXY, float parentAngleZX, float theLength);
     void calculatePosition(float windAngle, float windMagnitude, const Vector3f &parent, float parentAngleXY, float parentAngleZX, double timestep);
-    Vector3f getPosition();
+    Vector3f getPosition() const { return position; }
     float getAngleXY();
     float getAngleZX();
+
 
     void drawLine();
 
