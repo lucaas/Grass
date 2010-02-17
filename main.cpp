@@ -17,19 +17,25 @@
 #include "BMPLoader.h"
 
 // the program should be run standing in the source directory
-#define TEXTURE_PATH "data/alfa.bmp"
+#define GRASS_TEXTURE_PATH "data/alfa.bmp"
+#define PLANE_TEXTURE_PATH "data/plane.bmp"
+
 
 using namespace std;
 
 float windAngle = 0.0f;
 float windMagnitude = 0.0f;
 double lastTime = 0.0;
+GLuint grassTexture;
+GLuint planeTexture;
 
 vector<Grass *> grasses;
 
 Camera camera;
 
 bool compare(const Grass *a, const Grass *b);
+GLuint loadTexture(char *texturepath, GLuint channels);
+
 
 /* GLUT callback Handlers */
 static void resize(int width, int height)
@@ -61,15 +67,22 @@ static void display(void)
     glLightiv(GL_LIGHT0, GL_SPOT_DIRECTION, light0_direction);
 
     //Draw plane
-    glDisable(GL_TEXTURE_2D);
+    glBindTexture( GL_TEXTURE_2D, planeTexture );
     glBegin(GL_QUADS);
         glColor3f(0.3f,0.5f,0.2f);
+        glTexCoord2f(0.0f, 0.0f);
         glVertex3f( -10.0f, 0.0f, -10.0f);
+
+        glTexCoord2f(1.0f, 0.0f);
         glVertex3f( 10.0f, 0.0f, -10.0f);
+
+        glTexCoord2f(1.0f, 1.0f);
         glVertex3f( 10.0f, 0.0f, 10.0f);
+
+        glTexCoord2f(0.0f, 1.0f);
         glVertex3f( -10.0f, 0.0f, 10.0f);
     glEnd();
-    glEnable(GL_TEXTURE_2D);
+
 
 
     // Draw grassess
@@ -78,6 +91,7 @@ static void display(void)
 
 
 
+    glBindTexture( GL_TEXTURE_2D, grassTexture );
 
     vector<Grass *>::iterator  iter = grasses.begin();
     while( iter != grasses.end())
@@ -121,30 +135,13 @@ void setupScene()
     float emission_color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emission_color);
 
+    glEnable(GL_TEXTURE_2D);
+
     // alpha blending
     glEnable(GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-
-    // texture
-    BMPClass bmp;
-	BMPLoad(TEXTURE_PATH,bmp);
-
-
-	glEnable(GL_TEXTURE_2D);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); /* or GL_REPLACE */
-	glTexImage2D(GL_TEXTURE_2D,0,3,bmp.width,bmp.height,0,GL_RGB,GL_UNSIGNED_BYTE,bmp.bytes);
-	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,bmp.width,bmp.height,0,GL_RGBA,GL_UNSIGNED_BYTE,bmp.bytes);
-
-
-
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glClearColor(0.4,0.6,0.9,0.0);
-
-
-
 
     // Populate the vector with Grass objects
     for (int i=0; i < 5000; i++)
@@ -152,19 +149,21 @@ void setupScene()
 
     sort(grasses.begin(), grasses.end(), compare);
 
+    grassTexture = loadTexture(GRASS_TEXTURE_PATH, GL_RGBA);
+    planeTexture = loadTexture(PLANE_TEXTURE_PATH, GL_RGB);
+
+
 }
 
 // Key handeler
 void key (unsigned char key, int x, int y)
 {
-    camera.key(key, x, y);
+    if (key=='w' || key=='a' || key=='s' || key=='d'){
+        camera.key(key, x, y);
+        sort(grasses.begin(), grasses.end(), compare);
+    }
 
-    // kolla om kamera-key tryckt, sortera om vektorn
-    sort(grasses.begin(), grasses.end(), compare);
-
-
-
-    printf("wind: %f\t%f\n", windAngle, windMagnitude);
+    //dsprintf("wind: %f\t%f\n", windAngle, windMagnitude);
 
     // Wind control
     if (key=='0')
@@ -270,4 +269,40 @@ bool compare(const Grass *a, const Grass *b)
     return aDiff.lengthSq() > bDiff.lengthSq();
 
 }
+
+GLuint loadTexture(char *texturepath, GLuint channels)
+{
+    GLuint texture;
+
+    // texture for grass
+    BMPClass bmp;
+	BMPLoad(texturepath,bmp);
+
+    // allocate a texture name
+    glGenTextures( 1, &texture );
+
+    // select our current texture
+    glBindTexture( GL_TEXTURE_2D, texture );
+
+	//glEnable(GL_TEXTURE_2D);
+
+
+	// texture without mipmaps
+	//glTexImage2D(GL_TEXTURE_2D,0,channels,bmp.width,bmp.height,0,channels,GL_UNSIGNED_BYTE,bmp.bytes);
+
+    // build our texture mipmaps, mipmaps our
+    gluBuild2DMipmaps(GL_TEXTURE_2D, channels, bmp.width, bmp.height, channels, GL_UNSIGNED_BYTE, bmp.bytes);
+
+
+    // when texture area is small, bilinear filter the closest mipmap
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+    // when texture area is large, bilinear filter the original
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR )
+    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); /* or GL_REPLACE */
+
+
+	return texture;
+
+}
+
 

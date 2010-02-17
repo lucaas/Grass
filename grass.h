@@ -10,6 +10,7 @@
 #include "segment.h"
 
 #define NUM_SEGMENTS 3
+#define BASE_WIDTH  0.15
 
 class Grass
 {

@@ -1,8 +1,6 @@
 #include "grass.h"
 #include "segment.h"
 
-#define BASE_WIDTH  0.1
-
 Grass::Grass()
 {
 
@@ -57,7 +55,6 @@ void Grass::calculate(float windAngle,float windMagnitude, double timestep)
 
 void Grass::draw()
 {
-
     glBegin(GL_QUAD_STRIP);
 
         //Ritar ut första segmentet
@@ -96,6 +93,7 @@ void Grass::draw()
     glDisable(GL_TEXTURE_2D);
     glBegin(GL_QUAD_STRIP);
         glColor3f(0.3f,0.5f,0.2f);
+
         glVertex3f(base.x - 0.5*cosVal, 0.0001f, base.z - 0.5*sinVal);
         glVertex3f(base.x + 0.5*cosVal, 0.0001f, base.z + 0.5*sinVal);
 
@@ -108,6 +106,8 @@ void Grass::draw()
 
     glEnd();
     glEnable(GL_TEXTURE_2D);
+
+
 
 }
 
