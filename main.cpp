@@ -19,6 +19,11 @@
 // the program should be run standing in the source directory
 #define TEXTURE_PATH "data/alfa.bmp"
 
+#define HELICOPTER 0
+#define NORMAL 1
+#define BREEZE 2
+#define TORNADO 3
+
 using namespace std;
 
 float windAngle = 0.0f;
@@ -154,7 +159,7 @@ void setupScene()
 
 
     // Populate the vector with Grass objects
-    for (int i=0; i < 10000; i++)
+    for (int i=0; i < 15000; i++)
        grasses.push_back(new Grass());
 
     sort(grasses.begin(), grasses.end(), compare);
@@ -187,14 +192,16 @@ void key (unsigned char key, int x, int y)
         windAngle -= 10;
 
     if (key=='h')
-        windType = 0;
+        windType = HELICOPTER;
+    if (key=='t')
+        windType = TORNADO;
     if (key=='n')
     {
         windAngle = 0.0f;
-        windType = 1;
+        windType = NORMAL;
     }
     if (key=='b')
-        windType = 2;
+        windType = BREEZE;
 
     if (key=='1')
         windCentre.x -= 0.1;
@@ -259,7 +266,7 @@ static void idle(void)
 
 Vector2f calculateWindAngle(Vector2f base)
 {
-    if(windType == 0)
+    if(windType == HELICOPTER)
     {
 
         float length = (base - windCentre).length();
@@ -273,19 +280,31 @@ Vector2f calculateWindAngle(Vector2f base)
         if(length < 0.1) length = 0.1;
         return Vector2f(windAngle * (180/M_PI), windMagnitude*(1/length));
     }
-    else if(windType == 1)
+    else if(windType == NORMAL)
     {
         windMagnitude += 0.00025 - 0.0005*rand()/(RAND_MAX);
 
         return Vector2f(windAngle, windMagnitude);
     }
-    else if(windType == 2)
+    else if(windType == BREEZE)
     {
         windAngle = sin(base.x/base.y);
         windAngle = windAngle * 180/M_PI;
         windMagnitude = 1 - 2.0*rand()/(RAND_MAX);
 
         return Vector2f(windAngle, windMagnitude);
+    }
+    else if(windType == TORNADO)
+    {
+        float length = (base - windCentre).length();
+        base = (base - windCentre);
+
+        if(base.x <= 0) windAngle = asin(base.y/length);
+        else windAngle = -asin(base.y/length) + M_PI;
+        windMagnitude += 0.0005 - 0.001*rand()/(RAND_MAX);
+
+        if(length < 0.1) length = 0.1;
+        return Vector2f(windAngle * (180/M_PI), windMagnitude*(5/(length)));
     }
 
     return Vector2f(0.0f, 0.0f);
