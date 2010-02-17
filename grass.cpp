@@ -53,6 +53,11 @@ void Grass::calculate(float windAngle,float windMagnitude, double timestep)
 
 }
 
+Vector2f Grass::getBase()
+{
+    return Vector2f(base.x, base.z);
+}
+
 void Grass::draw()
 {
     glBegin(GL_QUAD_STRIP);
@@ -106,8 +111,6 @@ void Grass::draw()
 
     glEnd();
     glEnable(GL_TEXTURE_2D);
-
-
 
 }
 

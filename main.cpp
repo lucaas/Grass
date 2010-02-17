@@ -21,20 +21,32 @@
 #define PLANE_TEXTURE_PATH "data/plane.bmp"
 
 
+#define HELICOPTER 0
+#define NORMAL 1
+#define BREEZE 2
+#define TORNADO 3
+
 using namespace std;
 
 float windAngle = 0.0f;
 float windMagnitude = 0.0f;
+int windType = 0;
 double lastTime = 0.0;
 GLuint grassTexture;
 GLuint planeTexture;
+
+Vector2f windCentre = Vector2f(0.0f, 0.0f);
 
 vector<Grass *> grasses;
 
 Camera camera;
 
+
+Vector2f calculateWindAngle(Vector2f base);
+
 bool compare(const Grass *a, const Grass *b);
 GLuint loadTexture(char *texturepath, GLuint channels);
+
 
 
 /* GLUT callback Handlers */
@@ -178,6 +190,28 @@ void key (unsigned char key, int x, int y)
     if (key=='6')
         windAngle -= 10;
 
+    //Välj vindtyp.. Fixa lite Radiobuttons eller ngt
+    if (key=='h')
+        windType = HELICOPTER;
+    if (key=='t')
+        windType = TORNADO;
+    if (key=='n')
+    {
+        windAngle = 0.0f;
+        windType = NORMAL;
+    }
+    if (key=='b')
+        windType = BREEZE;
+
+    if (key=='1')
+        windCentre.x -= 0.1;
+    if (key=='3')
+        windCentre.x += 0.1;
+    if (key=='7')
+        windCentre.y -= 0.1;
+    if (key=='9')
+        windCentre.y += 0.1;
+
     // ESC => Exit
     if (key == 27)
         exit(0);
@@ -211,22 +245,70 @@ static void idle(void)
         else
             timestep = t - lastTime;
 
-
         lastTime = t;
 
         vector<Grass *>::iterator  iter = grasses.begin();
         while( iter != grasses.end())
         {
             //Lägger på randomtal på vindstyrkan
-            windMagnitude += 0.00025 - 0.0005*rand()/(RAND_MAX);
 
-            (*iter)->calculate(windAngle, windMagnitude, timestep);
+            Vector2f base = (*iter)->getBase();
+            Vector2f windData = calculateWindAngle(base);
+
+            (*iter)->calculate(windData.x, windData.y, timestep);
             ++iter;
         }
        // printf("time: %f\n", deltaT);
 
     glutPostRedisplay();
 
+}
+
+//Beräkna vindens riktning och styrka för varje grässtrå
+Vector2f calculateWindAngle(Vector2f base)
+{
+    if(windType == HELICOPTER)
+    {
+
+        float length = (base - windCentre).length();
+        base = (base - windCentre);
+
+        if(base.x <= 0) windAngle = asin(base.y/length);
+        else windAngle = -asin(base.y/length) + M_PI;
+        windAngle = windAngle - M_PI/2;
+        windMagnitude += 0.0005 - 0.001*rand()/(RAND_MAX);
+
+        if(length < 0.1) length = 0.1;
+        return Vector2f(windAngle * (180/M_PI), windMagnitude*(1/length));
+    }
+    else if(windType == NORMAL)
+    {
+        windMagnitude += 0.00025 - 0.0005*rand()/(RAND_MAX);
+
+        return Vector2f(windAngle, windMagnitude);
+    }
+    else if(windType == BREEZE)
+    {
+        windAngle = sin(base.x/base.y);
+        windAngle = windAngle * 180/M_PI;
+        windMagnitude = 1 - 2.0*rand()/(RAND_MAX);
+
+        return Vector2f(windAngle, windMagnitude);
+    }
+    else if(windType == TORNADO)
+    {
+        float length = (base - windCentre).length();
+        base = (base - windCentre);
+
+        if(base.x <= 0) windAngle = asin(base.y/length);
+        else windAngle = -asin(base.y/length) + M_PI;
+        windMagnitude += 0.0005 - 0.001*rand()/(RAND_MAX);
+
+        if(length < 0.1) length = 0.1;
+        return Vector2f(windAngle * (180/M_PI), windMagnitude*(5/(length)));
+    }
+
+    return Vector2f(0.0f, 0.0f);
 }
 
 int main(int argc, char *argv[])
@@ -297,7 +379,7 @@ GLuint loadTexture(char *texturepath, GLuint channels)
     // when texture area is small, bilinear filter the closest mipmap
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
     // when texture area is large, bilinear filter the original
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR )
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); /* or GL_REPLACE */
 
 
