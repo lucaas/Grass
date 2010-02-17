@@ -22,13 +22,16 @@ using namespace std;
 
 float windAngle = 0.0f;
 float windMagnitude = 0.0f;
+int windType = 0;
 double lastTime = 0.0;
+
+Vector2f windCentre = Vector2f(0.0f, 0.0f);
 
 vector<Grass *> grasses;
 
 Camera camera;
 
-
+Vector2f calculateWindAngle(Vector2f base);
 
 /* GLUT callback Handlers */
 static void resize(int width, int height)
@@ -144,6 +147,25 @@ void key (unsigned char key, int x, int y)
     if (key=='6')
         windAngle -= 10;
 
+    if (key=='h')
+        windType = 0;
+    if (key=='n')
+    {
+        windAngle = 0.0f;
+        windType = 1;
+    }
+    if (key=='b')
+        windType = 2;
+
+    if (key=='1')
+        windCentre.x -= 0.1;
+    if (key=='3')
+        windCentre.x += 0.1;
+    if (key=='7')
+        windCentre.y -= 0.1;
+    if (key=='9')
+        windCentre.y += 0.1;
+
     // ESC => Exit
     if (key == 27)
         exit(0);
@@ -177,22 +199,57 @@ static void idle(void)
         else
             timestep = t - lastTime;
 
-
         lastTime = t;
 
         vector<Grass *>::iterator  iter = grasses.begin();
         while( iter != grasses.end())
         {
             //Lägger på randomtal på vindstyrkan
-            windMagnitude += 0.00025 - 0.0005*rand()/(RAND_MAX);
 
-            (*iter)->calculate(windAngle, windMagnitude, timestep);
+            Vector2f base = (*iter)->getBase();
+            Vector2f windData = calculateWindAngle(base);
+
+            (*iter)->calculate(windData.x, windData.y, timestep);
             ++iter;
         }
        // printf("time: %f\n", deltaT);
 
     glutPostRedisplay();
 
+}
+
+Vector2f calculateWindAngle(Vector2f base)
+{
+    if(windType == 0)
+    {
+
+        float length = (base - windCentre).length();
+        base = (base - windCentre);
+
+        if(base.x <= 0) windAngle = asin(base.y/length);
+        else windAngle = -asin(base.y/length) + M_PI;
+        windAngle = windAngle - M_PI/2;
+        windMagnitude += 0.0005 - 0.001*rand()/(RAND_MAX);
+
+        if(length < 0.1) length = 0.1;
+        return Vector2f(windAngle * (180/M_PI), windMagnitude*(1/length));
+    }
+    else if(windType == 1)
+    {
+        windMagnitude += 0.00025 - 0.0005*rand()/(RAND_MAX);
+
+        return Vector2f(windAngle, windMagnitude);
+    }
+    else if(windType == 2)
+    {
+        windAngle = sin(base.x/base.y);
+        windAngle = windAngle * 180/M_PI;
+        windMagnitude = 1 - 2.0*rand()/(RAND_MAX);
+
+        return Vector2f(windAngle, windMagnitude);
+    }
+
+    return Vector2f(0.0f, 0.0f);
 }
 
 int main(int argc, char *argv[])

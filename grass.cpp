@@ -55,6 +55,11 @@ void Grass::calculate(float windAngle,float windMagnitude, double timestep)
 
 }
 
+Vector2f Grass::getBase()
+{
+    return Vector2f(base.x, base.z);
+}
+
 void Grass::draw()
 {
 
@@ -90,7 +95,7 @@ void Grass::draw()
 
 
     glEnd();
-
+/*
     //Ritar ut skuggor till gräset
     glDisable(GL_TEXTURE_2D);
     glBegin(GL_QUAD_STRIP);
@@ -107,5 +112,5 @@ void Grass::draw()
 
     glEnd();
     glEnable(GL_TEXTURE_2D);
-
+*/
 }
