@@ -178,8 +178,11 @@ void key (unsigned char key, int x, int y)
     //dsprintf("wind: %f\t%f\n", windAngle, windMagnitude);
 
     // Wind control
-    if (key=='0')
+    if (key=='0'){
         windMagnitude = 0;
+        windCentre.x = 0;
+        windCentre.y = 0;
+    }
     if (key=='8' && windMagnitude < 10)
         windMagnitude += 0.1;
     if (key=='2' && windMagnitude > -10)
@@ -291,7 +294,7 @@ Vector2f calculateWindAngle(Vector2f base)
     {
         windAngle = sin(base.x/base.y);
         windAngle = windAngle * 180/M_PI;
-        windMagnitude = 1 - 2.0*rand()/(RAND_MAX);
+        windMagnitude = 0.125/2 - .125*rand()/(RAND_MAX);
 
         return Vector2f(windAngle, windMagnitude);
     }
