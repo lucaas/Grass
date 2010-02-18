@@ -11,6 +11,9 @@
 #include <vector>
 #include <algorithm>
 
+#include <sstream>
+#include <string>
+
 #include "vmath.h"
 #include "grass.h"
 #include "camera.h"
@@ -30,7 +33,8 @@ using namespace std;
 
 float windAngle = 0.0f;
 float windMagnitude = 0.0f;
-int windType = 0;
+int windType, k, fps = 0;
+char title [20];
 double lastTime = 0.0;
 GLuint grassTexture;
 GLuint planeTexture;
@@ -111,10 +115,6 @@ static void display(void)
         (*iter)->draw();
         ++iter;
     }
-
-
-
-
 
     glutSwapBuffers();
 }
@@ -242,6 +242,13 @@ static void idle(void)
 
     double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
 
+    if(t>k){
+        sprintf(title,"Grass - FPS: %i",fps);
+        glutSetWindowTitle(title);
+        k++;
+        fps = 0;
+    }
+
         double timestep;
         if (lastTime == 0.0 || t - lastTime > 1.0)
             timestep = 0.001;
@@ -254,7 +261,6 @@ static void idle(void)
         while( iter != grasses.end())
         {
             //Lägger på randomtal på vindstyrkan
-
             Vector2f base = (*iter)->getBase();
             Vector2f windData = calculateWindAngle(base);
 
@@ -264,6 +270,7 @@ static void idle(void)
        // printf("time: %f\n", deltaT);
 
     glutPostRedisplay();
+    fps++;
 
 }
 
