@@ -24,23 +24,20 @@ Segment::Segment(const Vector3f &parent, float parentAngleXY, float parentAngleZ
 
 void Segment::init(const Vector3f &parent, float parentAngleXY, float parentAngleZX, float theLength)
 {
+
+    // Sätt fysikaliska konstanter utifrån segmentets längd.
+
     length = theLength;
     mass = length * 0.01f;
-
     springConstantXY = length*0.01f + 0.00001f*rand()/((float)(RAND_MAX));
-    springConstantZX = length*0.01f;
-
-  //  springConstantXY = 0.002f + 0.0001f*rand()/((float)(RAND_MAX));
-
-
-    // Inertia = (0.003g * 0.5m * 0.5m) / 3
     inertia = (mass * length * length) / 3.0f;
+
+
 
     angleXY = parentAngleXY;
     angularVelocityXY = 0.0f;
 
     angleZX = parentAngleZX;
-    angularVelocityZX = 0.0f;
 
 
     position = Vector3f();
@@ -52,49 +49,48 @@ void Segment::init(const Vector3f &parent, float parentAngleXY, float parentAngl
 
 }
 
-void Segment::calculatePosition(float windAngle, float windMagnitude, const Vector3f &parent, float parentAngleXY, float parentAngleZX, double timestep)
+void Segment::calculatePosition(float windAngle, float windMagnitude, const Vector3f &parent, float parentAngleXY, double timestep)
 {
 
-    // sin(angleXY) makes it hard to move vertically when grass is close to the ground...
-    // but also in the horisontal direction, which we dont want..
-    Vector3f wind = Vector3f(windMagnitude * cos(DEG2RAD(windAngle)), 0.0f, windMagnitude * sin(DEG2RAD(windAngle)));
+    // Calculating force vector
+    Vector3f force = Vector3f(windMagnitude * cos(DEG2RAD(windAngle)), 0.0f, windMagnitude * sin(DEG2RAD(windAngle)));
+    force *= sin(DEG2RAD(angleXY));
+    force.y = -GRAVITY * mass;
 
-    Vector3f force = wind * sin(DEG2RAD(angleXY));
-
-   // Vector3f force = wind;
-    //Vector3f force = wind;
-    force.y += -GRAVITY * mass;
-
-    debugLine3 = position + force;
-
-
+    // Ta ut en en fin vektor
     Vector3f tangularXY;
     tangularXY.x =  -1 *    sin(DEG2RAD(angleXY)) * cos(DEG2RAD(windAngle));
-    tangularXY.y = -1 * cos(DEG2RAD(angleXY));
+    tangularXY.y =  -1 *    cos(DEG2RAD(angleXY));
     tangularXY.z =  -1 *    sin(DEG2RAD(angleXY)) * sin(DEG2RAD(windAngle));
 
 
+    // kraften i tangentens riktning
     float tangularForceXY =  tangularXY.dotProduct(force);
-
     float tauXY = (length/2.0)*tangularForceXY - springConstantXY*(angleXY - parentAngleXY);
-    angularVelocityXY = angularVelocityXY + (1.0f/inertia)*tauXY*timestep;
-    angularVelocityXY *= FRICTION;
-    angleXY = angleXY + angularVelocityXY*timestep;
 
+    // vinkelhastighetsökning, steg ett (utifrån nuvarande vinkel)
+    float k1 = (1.0f/inertia)*tauXY*timestep;
+
+    // Kraft och hastighet steg två (utifrån ny vinkel)
+    tauXY = (length/2.0)*tangularForceXY - springConstantXY*((angleXY+((angularVelocityXY+k1)*timestep)) - parentAngleXY);
+    float k2 = (1.0f/inertia)*tauXY*timestep;
+
+    // Ny hastighet = medelvärdet av föränringarna i steg ett och två, minus lite friktion
+    angularVelocityXY = angularVelocityXY + (k1 + k2)/2.0f;
+    angularVelocityXY *= FRICTION;
+
+    // updatera  vinkel inom max/min-gräns
+    angleXY = angleXY + angularVelocityXY*timestep;
+    angleXY = (angleXY > 90 + 110) ? 90 + 110 : angleXY;
+    angleXY = (angleXY < 90 - 110) ? 90 - 110 : angleXY;
+
+    // uppdatera rotation i planet
     angleZX += 0.1*(windAngle - angleZX);
 
-    float angle = 90.0f;
-
+    // updatera position för segmentet
     position.x = parent.x + length * cos(DEG2RAD(angleXY)) * sin(DEG2RAD(angleZX));
     position.y = parent.y + length * sin(DEG2RAD(angleXY));
     position.z = parent.z + length * cos(DEG2RAD(angleXY)) * cos(DEG2RAD(angleZX));
-
-
-
-  //  tangularXY *= tangularForceXY;
-  //  tangularZX *= tangularForceZX;
-    debugLine = position + tangularXY;
-
 }
 
 
@@ -108,26 +104,4 @@ float Segment::getAngleZX()
     return angleZX;
 }
 
-void Segment::drawLine() {
-
-    glLineWidth(3.0);
-    glBegin(GL_LINES);
-        glColor3f(1.0f, 0.0, 1.0f);
-        glVertex3f(position.x, position.y, position.z);
-        glVertex3f(debugLine.x, debugLine.y, debugLine.z);
-    glEnd();
-    glBegin(GL_LINES);
-        glColor3f(1.0f, 1.0, 0.0f);
-        glVertex3f(position.x, position.y, position.z);
-        glVertex3f(debugLine2.x, debugLine2.y, debugLine2.z);
-    glEnd();
-
-    glBegin(GL_LINES);
-        glColor3f(0.0f, 1.0, 1.0f);
-        glVertex3f(position.x, position.y, position.z);
-        glVertex3f(debugLine3.x, debugLine3.y, debugLine3.z);
-    glEnd();
-
-
-}
 

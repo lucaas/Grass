@@ -50,7 +50,7 @@ Vector2f calculateWindAngle(Vector2f base);
 
 bool compare(const Grass *a, const Grass *b);
 GLuint loadTexture(char *texturepath, GLuint channels);
-
+void RenderSkybox(Vector3f position,Vector3f size,GLuint *SkyBox);
 
 
 /* GLUT callback Handlers */
@@ -61,7 +61,7 @@ static void resize(int width, int height)
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glFrustum(-ar, ar, -1.0, 1.0, 2.5, 100.0);
+    glFrustum(-ar, ar, -1.0, 1.0, 2.5, 200.0);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -72,6 +72,9 @@ static void display(void)
 {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    RenderSkybox(camera.getPosition(), Vector3f(100,100,100), &planeTexture);
+
 
     glLoadIdentity();
     camera.move();
@@ -129,7 +132,7 @@ void setupScene()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    GLfloat light0_ambient[] = {0.0, 0.0, 0.0, 1.0};
+    GLfloat light0_ambient[] = {0.1, 0.1, 0.1, 1.0};
     GLfloat light0_diffuse[] = {1.0, 1.0, 1.0, 1.0};
     GLfloat light0_specular[] = {0.25, 0.25, 0.25, 1.0};
 
@@ -156,7 +159,7 @@ void setupScene()
     glClearColor(0.4,0.6,0.9,0.0);
 
     // Populate the vector with Grass objects
-    for (int i=0; i < 5000; i++)
+    for (int i=0; i < 10000; i++)
        grasses.push_back(new Grass());
 
     sort(grasses.begin(), grasses.end(), compare);
@@ -192,6 +195,7 @@ void key (unsigned char key, int x, int y)
         windAngle += 10;
     if (key=='6')
         windAngle -= 10;
+
 
     //Välj vindtyp.. Fixa lite Radiobuttons eller ngt
     if (key=='h')
@@ -250,8 +254,8 @@ static void idle(void)
     }
 
         double timestep;
-        if (lastTime == 0.0 || t - lastTime > 1.0)
-            timestep = 0.001;
+        if (lastTime == 0.0 || t - lastTime > 0.03)
+            timestep = 0.03;
         else
             timestep = t - lastTime;
 
@@ -279,17 +283,22 @@ Vector2f calculateWindAngle(Vector2f base)
 {
     if(windType == HELICOPTER)
     {
-
         float length = (base - windCentre).length();
         base = (base - windCentre);
 
-        if(base.x <= 0) windAngle = asin(base.y/length);
-        else windAngle = -asin(base.y/length) + M_PI;
-        windAngle = windAngle - M_PI/2;
-        windMagnitude += 0.0005 - 0.001*rand()/(RAND_MAX);
+        base.y *= -1;
 
-        if(length < 0.1) length = 0.1;
-        return Vector2f(windAngle * (180/M_PI), windMagnitude*(1/length));
+        if(base.x > 0.0 && base.y >= 0.0) windAngle = atan(base.y/base.x);
+        else if(base.x > 0.0 && base.y < 0.0) windAngle = atan(base.y/base.x) + 2*M_PI;
+        else if(base.x < 0.0) windAngle = atan(base.y/base.x) + M_PI;
+        else if(base.x == 0.0 && base.y > 0.0) windAngle = M_PI*0.5;
+        else if(base.x == 0.0 && base.y < 0.0) windAngle = M_PI*1.5;
+        else windAngle = 0;
+
+        windAngle += M_PI/2;
+
+        windMagnitude += 0.0005 - 0.001*rand()/(RAND_MAX);
+        return Vector2f(windAngle * (180/M_PI), windMagnitude*(2/(length+0.001f)));
     }
     else if(windType == NORMAL)
     {
@@ -315,7 +324,7 @@ Vector2f calculateWindAngle(Vector2f base)
         windMagnitude += 0.0005 - 0.001*rand()/(RAND_MAX);
 
         if(length < 0.1) length = 0.1;
-        return Vector2f(windAngle * (180/M_PI), windMagnitude*(5/(length)));
+        return Vector2f(windAngle * (180/M_PI), windMagnitude*(5/(length+0.0001)));
     }
 
     return Vector2f(0.0f, 0.0f);
@@ -397,4 +406,78 @@ GLuint loadTexture(char *texturepath, GLuint channels)
 
 }
 
+/************************************************************************/
+/*	Render a skybox with center point position and dimension sizes size */
+/************************************************************************/
+void RenderSkybox(Vector3f position,Vector3f size,GLuint *SkyBox)
+{
+// djoubert187 _at_ hotmail.com
+	// Begin DrawSkybox
+	glColor4f(0.4, 0.7, 1.0,1.0f);
+
+	// Save Current Matrix
+	glPushMatrix();
+
+	// Second Move the render space to the correct position (Translate)
+	glTranslatef(position.x,position.y,position.z);
+
+	// First apply scale matrix
+	glScalef(size.x,size.y,size.z);
+
+	float cz = -0.0f,cx = 1.0f;
+	float r = 1.0f; // If you have border issues change this to 1.005f
+	// Common Axis Z - FRONT Side
+	glBindTexture(GL_TEXTURE_2D,SkyBox[0]);
+	glBegin(GL_QUADS);
+		glTexCoord2f(cx, cz); glVertex3f(-r ,1.0f,-r);
+		glTexCoord2f(cx,  cx); glVertex3f(-r,1.0f,r);
+		glTexCoord2f(cz,  cx); glVertex3f( r,1.0f,r);
+		glTexCoord2f(cz, cz); glVertex3f( r ,1.0f,-r);
+	glEnd();
+
+	// Common Axis Z - BACK side
+
+	glBegin(GL_QUADS);
+		glTexCoord2f(cx,cz);  glVertex3f(-r,-1.0f,-r);
+		glTexCoord2f(cx,cx);  glVertex3f(-r,-1.0f, r);
+		glTexCoord2f(cz,cx);  glVertex3f( r,-1.0f, r);
+		glTexCoord2f(cz,cz);  glVertex3f( r,-1.0f,-r);
+	glEnd();
+
+	// Common Axis X - Left side
+	glBegin(GL_QUADS);
+		glTexCoord2f(cx,cx); glVertex3f(-1.0f, -r, r);
+		glTexCoord2f(cz,cx); glVertex3f(-1.0f,  r, r);
+		glTexCoord2f(cz,cz); glVertex3f(-1.0f,  r,-r);
+		glTexCoord2f(cx,cz); glVertex3f(-1.0f, -r,-r);
+	glEnd();
+
+	// Common Axis X - Right side
+	glBegin(GL_QUADS);
+		glTexCoord2f( cx,cx); glVertex3f(1.0f, -r, r);
+		glTexCoord2f(cz, cx); glVertex3f(1.0f,  r, r);
+		glTexCoord2f(cz, cz); glVertex3f(1.0f,  r,-r);
+		glTexCoord2f(cx, cz); glVertex3f(1.0f, -r,-r);
+	glEnd();
+
+	// Common Axis Y - Draw Up side
+	glBegin(GL_QUADS);
+		glTexCoord2f(cz, cz); glVertex3f( r, -r,1.0f);
+		glTexCoord2f(cx, cz); glVertex3f( r,  r,1.0f);
+		glTexCoord2f(cx, cx); glVertex3f(-r,  r,1.0f);
+		glTexCoord2f(cz, cx); glVertex3f(-r, -r,1.0f);
+	glEnd();
+
+	// Common Axis Y - Down side
+	glBegin(GL_QUADS);
+		glTexCoord2f(cz,cz);  glVertex3f( r, -r,-1.0f);
+		glTexCoord2f( cx,cz); glVertex3f( r,  r,-1.0f);
+		glTexCoord2f( cx,cx); glVertex3f(-r,  r,-1.0f);
+		glTexCoord2f(cz, cx); glVertex3f(-r, -r,-1.0f);
+	glEnd();
+
+	// Load Saved Matrix
+	glPopMatrix();
+
+};
 
