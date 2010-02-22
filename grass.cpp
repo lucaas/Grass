@@ -11,6 +11,15 @@ Grass::Grass()
     init(xpos,zpos);
 }
 
+Grass::Grass(float size)
+{
+    // Random nummer mellan -10 och 10
+    float xpos = size*(rand()/float(RAND_MAX)) - size/2;
+    float zpos = size*(rand()/float(RAND_MAX)) - size/2;
+
+    init(xpos,zpos);
+}
+
 Grass::Grass(float x, float z)
 {
     init(x,z);
@@ -46,15 +55,11 @@ Grass::~Grass()
 
 void Grass::calculate(float windAngle,float windMagnitude, double timestep)
 {
-    segments[0].calculatePosition(windAngle, windMagnitude, base, initialAngleXY, timestep);
-    for (int i=1; i < NUM_SEGMENTS; i++)
-        segments[i].calculatePosition(windAngle, windMagnitude, segments[i-1].getPosition(), segments[i-1].getAngleXY(), timestep);
 
-}
+        segments[0].calculatePosition(windAngle, windMagnitude, base, initialAngleXY, timestep);
+        for (int i=1; i < NUM_SEGMENTS; i++)
+            segments[i].calculatePosition(windAngle, windMagnitude, segments[i-1].getPosition(), segments[i-1].getAngleXY(), timestep);
 
-Vector2f Grass::getBase()
-{
-    return Vector2f(base.x, base.z);
 }
 
 void Grass::draw()

@@ -7,7 +7,6 @@
 #endif
 #include <math.h>
 
-
 Camera::Camera()
 {
     xpos = 0;
