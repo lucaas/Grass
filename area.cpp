@@ -1,6 +1,6 @@
 #include "area.h"
 
-#define MAXGRASS 50
+#define MAXGRASS 75
 #define HELICOPTER 0
 #define NORMAL 1
 #define BREEZE 2
@@ -9,22 +9,27 @@
 
 Area::Area()
 {
-    init(0.5, 5, Vector2f(0.0f, 0.0f));
+    printf("ERROR!\n");
 }
 
-Area::Area(float density, float size, Vector2f center)
+Area::Area(float density, float size, Vector2f center, Terrain *terrain)
 {
-    init(density, size, center);
+        init(density, size, center, terrain);
 }
 
-void Area::init(float density, float size, Vector2f center)
+void Area::init(float density, float size, Vector2f center, Terrain *terrain)
 {
     this->density = density;
     this->size = size;
     this->center = center;
 
     for(int i = 0; i < MAXGRASS*density; i++)
-        grasses.push_back(new Grass(size));
+    {
+        float xpos = size*(rand()/float(RAND_MAX)) - size/2;
+        float zpos = size*(rand()/float(RAND_MAX)) - size/2;
+        float ypos = terrain->getHeight(center.x + xpos, center.y + zpos);
+        grasses.push_back(new Grass(xpos, ypos, zpos));
+    }
 }
 
 void Area::draw()

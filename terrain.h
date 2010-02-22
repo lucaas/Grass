@@ -1,5 +1,6 @@
 
-
+#ifndef __TERRAIN_H__
+#define __TERRAIN_H__
 
 struct Vertex
 {
@@ -34,3 +35,5 @@ public:
         float getHeight(float x, float z);
         void render();
 };
+
+#endif

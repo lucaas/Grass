@@ -25,6 +25,8 @@
 #define PLANE_TEXTURE_PATH "data/plane.bmp"
 #define HEIGHTMAP_PATH "data/heightmap.bmp"
 #define HEIGHTMAP_SIZE 32
+#define HEIGHTMAP_SCALE 1
+#define AREA_SIZE 2
 
 #define HELICOPTER 0
 #define NORMAL 1
@@ -37,7 +39,7 @@ using namespace std;
 float windAngle = 0.0f;
 float windMagnitude = 0.0f;
 int windType, k, fps = 0;
-char title [20];
+char title [30];
 double lastTime = 0.0;
 GLuint grassTexture;
 GLuint planeTexture;
@@ -46,12 +48,12 @@ Vector2f windCentre = Vector2f(0.0f, 0.0f);
 
 vector<Grass *> grasses;
 vector<Area *> areas;
+int numGrasses = 0;
 
 Wind wind;
 
 Camera camera;
 Terrain *terrain;
-int scale;
 
 Vector2f calculateWindAngle(Vector2f base);
 
@@ -71,7 +73,7 @@ static void display(void)
     glLoadIdentity();
     camera.move();
 
-    GLfloat light0_position[] = {0.5*scale*HEIGHTMAP_SIZE, 10.0, 0.5*scale*HEIGHTMAP_SIZE, 1.0};
+    GLfloat light0_position[] = {0.5*HEIGHTMAP_SCALE*HEIGHTMAP_SIZE, 10.0, 0.5*HEIGHTMAP_SCALE*HEIGHTMAP_SIZE, 1.0};
     glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
     GLint light0_direction[] = {-2, -1, -2};
 
@@ -134,16 +136,17 @@ void setupScene()
     glClearColor(0.4,0.6,0.9,0.0);
 
     // Generate terrain
-    scale = 2;
-    terrain = new Terrain(HEIGHTMAP_PATH, HEIGHTMAP_SIZE, scale, 1.0f);
+    terrain = new Terrain(HEIGHTMAP_PATH, HEIGHTMAP_SIZE, HEIGHTMAP_SCALE, 1.0f);
 
     wind = Wind();
 
+    numGrasses = 0;
     // Populate the vector with Area objects
-    for(int i = -0.5*HEIGHTMAP_SIZE*scale; i <= 0.5*HEIGHTMAP_SIZE*scale; i++) {
-        for(int j = -0.5*HEIGHTMAP_SIZE*scale; j <= 0.5*HEIGHTMAP_SIZE*scale; j++) {
+    for(int i = -0.5*HEIGHTMAP_SIZE*HEIGHTMAP_SCALE + 0.5*AREA_SIZE; i < 0.5*HEIGHTMAP_SIZE*HEIGHTMAP_SCALE; i += AREA_SIZE) {
+        for(int j = -0.5*HEIGHTMAP_SIZE*HEIGHTMAP_SCALE + 0.5*AREA_SIZE; j < 0.5*HEIGHTMAP_SIZE*HEIGHTMAP_SCALE; j += AREA_SIZE) {
             float density = (rand()/(float)RAND_MAX)+0.1;
-            areas.push_back(new Area(density, 1.0f, Vector2f(i, j), terrain));
+            areas.push_back(new Area(density, AREA_SIZE, Vector2f(i, j), terrain));
+            numGrasses += (areas.back())->getSize();
         }
     }
 
@@ -165,7 +168,7 @@ static void idle(void)
     double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
 
     if(t>k){
-        sprintf(title,"Grass - FPS: %i",fps);
+        sprintf(title,"Grass - [ FPS: %i | OBJ: %i ]", fps, numGrasses);
         glutSetWindowTitle(title);
         k++;
         fps = 0;

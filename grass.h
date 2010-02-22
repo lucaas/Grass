@@ -27,7 +27,6 @@ private:
 
 public:
     Grass();
-    Grass(float size, float y);
     Grass(float x, float y, float z);
     void init(float x, float y, float z);
 

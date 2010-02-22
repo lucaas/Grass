@@ -12,6 +12,7 @@
 #include "vmath.h"
 #include "grass.h"
 #include "wind.h"
+#include "terrain.h"
 
 #ifndef __AREA_H__
 #define __AREA_H__
@@ -28,12 +29,13 @@ Vector2f center;
 public:
 
 Area();
-Area(float density, float size, Vector2f center);
+Area(float density, float size, Vector2f center, Terrain *terrain);
 
-void init(float density, float size, Vector2f center);
+void init(float density, float size, Vector2f center, Terrain *terrain);
 void draw();
 void calculate(float timestep, Vector2f camera, Wind wind);
-Vector2f getCenter() const {return center;};
+Vector2f getCenter() const {return center;}
+int getSize(){ return grasses.size(); }
 
 };
 

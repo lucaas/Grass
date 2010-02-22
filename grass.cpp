@@ -11,15 +11,6 @@ Grass::Grass()
     init(xpos, 0.0f, zpos);
 }
 
-Grass::Grass(float size, float ypos)
-{
-    // Random nummer mellan -10 och 10
-    float xpos = size*(rand()/float(RAND_MAX)) - size/2;
-    float zpos = size*(rand()/float(RAND_MAX)) - size/2;
-
-    init(xpos, ypos, zpos);
-}
-
 
 Grass::Grass(float x, float y, float z)
 {
