@@ -12,6 +12,9 @@
 #define NUM_SEGMENTS 3
 #define BASE_WIDTH  0.15
 
+#ifndef __GRASS_H__
+#define __GRASS_H__
+
 class Grass
 {
 private:
@@ -24,15 +27,16 @@ private:
 
 public:
     Grass();
-    Grass(float x, float z);
+    Grass(float size, float y);
     Grass(float x, float y, float z);
     void init(float x, float y, float z);
-    Vector2f getBase();
 
     ~Grass();
 
     void draw();
     void calculate(float windAngle,float windMagnitude, double timestep);
     Vector3f getPosition() const { return segments[0].getPosition(); }
-
+    Vector2f getBase() const { return Vector2f(base.x, base.z); };
 };
+
+#endif

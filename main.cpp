@@ -7,18 +7,18 @@
 
 #include <cstdlib>
 #include <stdlib.h>
-
 #include <vector>
 #include <algorithm>
-
 #include <sstream>
 #include <string>
 
+#include "wind.h"
 #include "vmath.h"
 #include "grass.h"
 #include "camera.h"
 #include "BMPLoader.h"
 #include "terrain.h"
+#include "area.h"
 
 // the program should be run standing in the source directory
 #define GRASS_TEXTURE_PATH "data/alfa.bmp"
@@ -30,6 +30,7 @@
 #define NORMAL 1
 #define BREEZE 2
 #define TORNADO 3
+
 
 using namespace std;
 
@@ -44,6 +45,9 @@ GLuint planeTexture;
 Vector2f windCentre = Vector2f(0.0f, 0.0f);
 
 vector<Grass *> grasses;
+vector<Area *> areas;
+
+Wind wind;
 
 Camera camera;
 Terrain *terrain;
@@ -51,30 +55,18 @@ int scale;
 
 Vector2f calculateWindAngle(Vector2f base);
 
-bool compare(const Grass *a, const Grass *b);
+bool compare(const Area *a, const Area *b);
 GLuint loadTexture(char *texturepath, GLuint channels);
+void RenderSkybox(Vector3f position,Vector3f size,GLuint *SkyBox);
 
-
-
-/* GLUT callback Handlers */
-static void resize(int width, int height)
-{
-    const float ar = (float) width / (float) height;
-
-    glViewport(0, 0, width, height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glFrustum(-ar, ar, -1.0, 1.0, 2.5, 100.0);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-}
 
 static void display(void)
 {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //RenderSkybox(camera.getPosition(), Vector3f(100,100,100), &planeTexture);
+
 
     glLoadIdentity();
     camera.move();
@@ -85,24 +77,6 @@ static void display(void)
 
     glLightiv(GL_LIGHT0, GL_SPOT_DIRECTION, light0_direction);
 
-    //Draw plane
- /*
-    glBindTexture( GL_TEXTURE_2D, planeTexture );
-    glBegin(GL_QUADS);
-        glColor3f(0.3f,0.5f,0.2f);
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f( -10.0f, 0.0f, -10.0f);
-
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f( 10.0f, 0.0f, -10.0f);
-
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f( 10.0f, 0.0f, 10.0f);
-
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f( -10.0f, 0.0f, 10.0f);
-    glEnd();
-*/
 
 
     glBindTexture( GL_TEXTURE_2D, planeTexture );
@@ -110,22 +84,11 @@ static void display(void)
     glColor3f(0.3f,0.5f,0.2f);
     terrain->render();
 
-   // glColor3f(1.0f,0.2f,0.2f);
-    glPushMatrix();
-        glTranslatef(15.0f, 5.0f, 15.0f);
-        //glutWireSphere(1.0, 32.0, 64.0);
-
-    glPopMatrix();
-    // Draw grassess
-
-    glLineWidth(3);
-
-
 
     glBindTexture( GL_TEXTURE_2D, grassTexture );
 
-    vector<Grass *>::iterator  iter = grasses.begin();
-    while( iter != grasses.end())
+    vector<Area *>::iterator  iter = areas.begin();
+    while( iter != areas.end())
     {
         (*iter)->draw();
         ++iter;
@@ -174,100 +137,30 @@ void setupScene()
     scale = 2;
     terrain = new Terrain(HEIGHTMAP_PATH, HEIGHTMAP_SIZE, scale, 1.0f);
 
-    // Populate the vector with Grass objects
-    for (int i=0; i < 10000; i++)
-    {
-        float xpos = (HEIGHTMAP_SIZE-2)*scale*(rand()/float(RAND_MAX)) - 0.5*(HEIGHTMAP_SIZE-1)*scale;
-        float zpos = (HEIGHTMAP_SIZE-2)*scale*(rand()/float(RAND_MAX)) - 0.5*(HEIGHTMAP_SIZE-1)*scale;
-        float ypos = terrain->getHeight(xpos, zpos);
+    wind = Wind();
 
-       grasses.push_back(new Grass(xpos, ypos, zpos));
+    // Populate the vector with Area objects
+    for(int i = -0.5*HEIGHTMAP_SIZE*scale; i <= 0.5*HEIGHTMAP_SIZE*scale; i++) {
+        for(int j = -0.5*HEIGHTMAP_SIZE*scale; j <= 0.5*HEIGHTMAP_SIZE*scale; j++) {
+            float density = (rand()/(float)RAND_MAX)+0.1;
+            areas.push_back(new Area(density, 1.0f, Vector2f(i, j), terrain));
+        }
     }
-    sort(grasses.begin(), grasses.end(), compare);
+
+    sort(areas.begin(), areas.end(), compare);
 
     grassTexture = loadTexture(GRASS_TEXTURE_PATH, GL_RGBA);
     planeTexture = loadTexture(PLANE_TEXTURE_PATH, GL_RGB);
 
-
-
-
-
-
-
 }
 
-// Key handeler
-void key (unsigned char key, int x, int y)
-{
-    if (key=='w' || key=='a' || key=='s' || key=='d'){
-        camera.key(key, x, y);
-        sort(grasses.begin(), grasses.end(), compare);
-    }
 
-    //dsprintf("wind: %f\t%f\n", windAngle, windMagnitude);
-
-    // Wind control
-    if (key=='0'){
-        windMagnitude = 0;
-        windCentre.x = 0;
-        windCentre.y = 0;
-    }
-    if (key=='8' && windMagnitude < 10)
-        windMagnitude += 0.1;
-    if (key=='2' && windMagnitude > -10)
-        windMagnitude -= 0.1;
-
-    if (key=='4')
-        windAngle += 10;
-    if (key=='6')
-        windAngle -= 10;
-
-    //Välj vindtyp.. Fixa lite Radiobuttons eller ngt
-    if (key=='h')
-        windType = HELICOPTER;
-    if (key=='t')
-        windType = TORNADO;
-    if (key=='n')
-    {
-        windAngle = 0.0f;
-        windType = NORMAL;
-    }
-    if (key=='b')
-        windType = BREEZE;
-
-    if (key=='1')
-        windCentre.x -= 0.1;
-    if (key=='3')
-        windCentre.x += 0.1;
-    if (key=='7')
-        windCentre.y -= 0.1;
-    if (key=='9')
-        windCentre.y += 0.1;
-
-    // ESC => Exit
-    if (key == 27)
-        exit(0);
-
-
-
-
-}
-void mouseClick(int button, int state, int x, int y)
-{
-    camera.mouseClick(button, state, x, y);
-}
-
-void mouseMovement(int x, int y) {
-    camera.mouseMovement(x, y);
-}
 
 
 
 
 static void idle(void)
 {
-
-
 
     double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
 
@@ -279,113 +172,32 @@ static void idle(void)
     }
 
         double timestep;
-        if (lastTime == 0.0 || t - lastTime > 1.0)
-            timestep = 0.001;
+        if (lastTime == 0.0 || t - lastTime > 0.03)
+            timestep = 0.03;
         else
             timestep = t - lastTime;
 
         lastTime = t;
 
-        vector<Grass *>::iterator  iter = grasses.begin();
-        while( iter != grasses.end())
+        //ITERATOR FÖR AREAS
+        vector<Area *>::iterator iter = areas.begin();
+        while( iter != areas.end())
         {
-            //Lägger på randomtal på vindstyrkan
-            Vector2f base = (*iter)->getBase();
-            Vector2f windData = calculateWindAngle(base);
-
-            (*iter)->calculate(windData.x, windData.y, timestep);
+            (*iter)->calculate(timestep, Vector2f(camera.getPosition().x, camera.getPosition().z), wind);
             ++iter;
         }
-       // printf("time: %f\n", deltaT);
 
     glutPostRedisplay();
     fps++;
 
 }
 
-//Beräkna vindens riktning och styrka för varje grässtrå
-Vector2f calculateWindAngle(Vector2f base)
+bool compare(const Area *a, const Area *b)
 {
-    if(windType == HELICOPTER)
-    {
+    Vector2f cameraPos = Vector2f(camera.getPosition().x, camera.getPosition().z);
 
-        float length = (base - windCentre).length();
-        base = (base - windCentre);
-
-        if(base.x <= 0) windAngle = asin(base.y/length);
-        else windAngle = -asin(base.y/length) + M_PI;
-        windAngle = windAngle - M_PI/2;
-        windMagnitude += 0.0005 - 0.001*rand()/(RAND_MAX);
-
-        if(length < 0.1) length = 0.1;
-        return Vector2f(windAngle * (180/M_PI), windMagnitude*(1/length));
-    }
-    else if(windType == NORMAL)
-    {
-        windMagnitude += 0.00025 - 0.0005*rand()/(RAND_MAX);
-
-        return Vector2f(windAngle, windMagnitude);
-    }
-    else if(windType == BREEZE)
-    {
-        windAngle = sin(base.x/base.y);
-        windAngle = windAngle * 180/M_PI;
-        windMagnitude = 0.125/2 - .125*rand()/(RAND_MAX);
-
-        return Vector2f(windAngle, windMagnitude);
-    }
-    else if(windType == TORNADO)
-    {
-        float length = (base - windCentre).length();
-        base = (base - windCentre);
-
-        if(base.x <= 0) windAngle = asin(base.y/length);
-        else windAngle = -asin(base.y/length) + M_PI;
-        windMagnitude += 0.0005 - 0.001*rand()/(RAND_MAX);
-
-        if(length < 0.1) length = 0.1;
-        return Vector2f(windAngle * (180/M_PI), windMagnitude*(5/(length)));
-    }
-
-    return Vector2f(0.0f, 0.0f);
-}
-
-int main(int argc, char *argv[])
-{
-   srand (time(NULL));
-
-    glutInit(&argc, argv);
-    glutInitWindowSize(800, 600);
-    glutInitWindowPosition(10,10);
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-
-
-
-    glutCreateWindow("Grass");
-
-    glutReshapeFunc(resize);
-    glutDisplayFunc(display);
-    glutKeyboardFunc(key);
-    glutMotionFunc(mouseMovement);
-    glutMouseFunc(mouseClick);
-    glutIdleFunc(idle);
-
-
-
-    setupScene();
-
-    glutMainLoop();
-
-    return EXIT_SUCCESS;
-}
-
-
-bool compare(const Grass *a, const Grass *b)
-{
-
-    Vector3f cameraPos = camera.getPosition();
-    Vector3f aDiff = a->getPosition() - cameraPos;
-    Vector3f bDiff = b->getPosition() - cameraPos;
+    Vector2f aDiff = a->getCenter() - cameraPos;
+    Vector2f bDiff = b->getCenter() - cameraPos;
 
     return aDiff.lengthSq() > bDiff.lengthSq();
 
@@ -424,6 +236,208 @@ GLuint loadTexture(char *texturepath, GLuint channels)
 
 	return texture;
 
+}
+
+/************************************************************************/
+/*	Render a skybox with center point position and dimension sizes size */
+/************************************************************************/
+void RenderSkybox(Vector3f position,Vector3f size,GLuint *SkyBox)
+{
+// djoubert187 _at_ hotmail.com
+	// Begin DrawSkybox
+	glColor4f(0.4, 0.7, 1.0,1.0f);
+
+	// Save Current Matrix
+	glPushMatrix();
+
+	// Second Move the render space to the correct position (Translate)
+	glTranslatef(position.x,position.y,position.z);
+
+	// First apply scale matrix
+	glScalef(size.x,size.y,size.z);
+
+	float cz = -0.0f,cx = 1.0f;
+	float r = 1.0f; // If you have border issues change this to 1.005f
+	// Common Axis Z - FRONT Side
+	glBindTexture(GL_TEXTURE_2D,SkyBox[0]);
+	glBegin(GL_QUADS);
+		glTexCoord2f(cx, cz); glVertex3f(-r ,1.0f,-r);
+		glTexCoord2f(cx,  cx); glVertex3f(-r,1.0f,r);
+		glTexCoord2f(cz,  cx); glVertex3f( r,1.0f,r);
+		glTexCoord2f(cz, cz); glVertex3f( r ,1.0f,-r);
+	glEnd();
+
+	// Common Axis Z - BACK side
+
+	glBegin(GL_QUADS);
+		glTexCoord2f(cx,cz);  glVertex3f(-r,-1.0f,-r);
+		glTexCoord2f(cx,cx);  glVertex3f(-r,-1.0f, r);
+		glTexCoord2f(cz,cx);  glVertex3f( r,-1.0f, r);
+		glTexCoord2f(cz,cz);  glVertex3f( r,-1.0f,-r);
+	glEnd();
+
+	// Common Axis X - Left side
+	glBegin(GL_QUADS);
+		glTexCoord2f(cx,cx); glVertex3f(-1.0f, -r, r);
+		glTexCoord2f(cz,cx); glVertex3f(-1.0f,  r, r);
+		glTexCoord2f(cz,cz); glVertex3f(-1.0f,  r,-r);
+		glTexCoord2f(cx,cz); glVertex3f(-1.0f, -r,-r);
+	glEnd();
+
+	// Common Axis X - Right side
+	glBegin(GL_QUADS);
+		glTexCoord2f( cx,cx); glVertex3f(1.0f, -r, r);
+		glTexCoord2f(cz, cx); glVertex3f(1.0f,  r, r);
+		glTexCoord2f(cz, cz); glVertex3f(1.0f,  r,-r);
+		glTexCoord2f(cx, cz); glVertex3f(1.0f, -r,-r);
+	glEnd();
+
+	// Common Axis Y - Draw Up side
+	glBegin(GL_QUADS);
+		glTexCoord2f(cz, cz); glVertex3f( r, -r,1.0f);
+		glTexCoord2f(cx, cz); glVertex3f( r,  r,1.0f);
+		glTexCoord2f(cx, cx); glVertex3f(-r,  r,1.0f);
+		glTexCoord2f(cz, cx); glVertex3f(-r, -r,1.0f);
+	glEnd();
+
+	// Common Axis Y - Down side
+	glBegin(GL_QUADS);
+		glTexCoord2f(cz,cz);  glVertex3f( r, -r,-1.0f);
+		glTexCoord2f( cx,cz); glVertex3f( r,  r,-1.0f);
+		glTexCoord2f( cx,cx); glVertex3f(-r,  r,-1.0f);
+		glTexCoord2f(cz, cx); glVertex3f(-r, -r,-1.0f);
+	glEnd();
+
+	// Load Saved Matrix
+	glPopMatrix();
+
+};
+
+
+/* ----------------- GLUT callback Handlers */
+void key (unsigned char key, int x, int y)
+{
+    if (key=='w' || key=='a' || key=='s' || key=='d'){
+        camera.key(key, x, y);
+        sort(areas.begin(), areas.end(), compare);
+    }
+
+    //dsprintf("wind: %f\t%f\n", windAngle, windMagnitude);
+
+    // Wind control
+    if (key=='0'){
+        wind.clearWind();
+    }
+    if (key=='8' && wind.getWindMagnitude() < 10)
+        wind.changeWindMagnitude(0.1f);
+
+    if (key=='2' && wind.getWindMagnitude() > -10)
+        wind.changeWindMagnitude(-0.1f);
+
+    if (key=='4')
+        wind.changeWindAngle(10.0f);
+    if (key=='6')
+        wind.changeWindAngle(-10.0f);
+
+
+    //Välj vindtyp.. Fixa lite Radiobuttons eller ngt
+    if (key=='h')
+        wind.setWindType(HELICOPTER);
+    if (key=='t')
+        wind.setWindType(TORNADO);
+    if (key=='n')
+    {
+        wind.clearWind();
+        wind.setWindType(NORMAL);
+    }
+    if (key=='b')
+        wind.setWindType(BREEZE);
+
+    if (key=='1')
+    {
+        Vector2f tempCenter = wind.getWindCenter();
+        tempCenter.x -= 0.1;
+        wind.setWindCenter(tempCenter);
+    }
+    if (key=='3')
+    {
+        Vector2f tempCenter = wind.getWindCenter();
+        tempCenter.x += 0.1;
+        wind.setWindCenter(tempCenter);
+    }
+    if (key=='7')
+    {
+        Vector2f tempCenter = wind.getWindCenter();
+        tempCenter.y -= 0.1;
+        wind.setWindCenter(tempCenter);
+    }
+    if (key=='9')
+    {
+        Vector2f tempCenter = wind.getWindCenter();
+        tempCenter.y += 0.1;
+        wind.setWindCenter(tempCenter);
+    }
+
+    // ESC => Exit
+    if (key == 27)
+        exit(0);
+
+
+
+
+}
+void mouseClick(int button, int state, int x, int y)
+{
+    camera.mouseClick(button, state, x, y);
+}
+
+void mouseMovement(int x, int y) {
+    camera.mouseMovement(x, y);
+}
+
+static void resize(int width, int height)
+{
+    const float ar = (float) width / (float) height;
+
+    glViewport(0, 0, width, height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glFrustum(-ar, ar, -1.0, 1.0, 2.5, 200.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+}
+/* ----------------- */
+
+
+int main(int argc, char *argv[])
+{
+   srand (time(NULL));
+
+    glutInit(&argc, argv);
+    glutInitWindowSize(800, 600);
+    glutInitWindowPosition(10,10);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+
+
+
+    glutCreateWindow("Grass");
+
+    glutReshapeFunc(resize);
+    glutDisplayFunc(display);
+    glutKeyboardFunc(key);
+    glutMotionFunc(mouseMovement);
+    glutMouseFunc(mouseClick);
+    glutIdleFunc(idle);
+
+
+
+    setupScene();
+
+    glutMainLoop();
+
+    return EXIT_SUCCESS;
 }
 
 

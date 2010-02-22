@@ -11,10 +11,15 @@ Grass::Grass()
     init(xpos, 0.0f, zpos);
 }
 
-Grass::Grass(float x, float z)
+Grass::Grass(float size, float ypos)
 {
-    init(x, 0.0f, z);
+    // Random nummer mellan -10 och 10
+    float xpos = size*(rand()/float(RAND_MAX)) - size/2;
+    float zpos = size*(rand()/float(RAND_MAX)) - size/2;
+
+    init(xpos, ypos, zpos);
 }
+
 
 Grass::Grass(float x, float y, float z)
 {
@@ -23,23 +28,20 @@ Grass::Grass(float x, float y, float z)
 
 void Grass::init(float x, float y, float z)
 {
+    // Startposition och vinkel
     base.x = x;
     base.y = y;
     base.z = z;
-
     initialAngleXY = 80.0f + 20.0*(rand()/float(RAND_MAX)); // 80-100 degrees
     initialAngleZX = 360.0*(rand()/float(RAND_MAX)); // 0-360 degrees
-    //initialAngleZX = 180.0f;
 
-    // 0.75- 1.25 * (0.4 + 0.25 + 0.2)
+    // gräsets längd, skapa segment
 	float lengthMultiplier = 1.75f + 0.5*(rand()/float(RAND_MAX)); // 0.75-1 * length
-
     segments[0] = Segment(base, initialAngleXY, initialAngleZX, lengthMultiplier * 0.4f);
-
     for (int i=1; i < NUM_SEGMENTS; i++)
         segments[i] = Segment(segments[i-1].getPosition(), segments[i-1].getAngleXY(), initialAngleZX, lengthMultiplier * (0.3f/(0.5f*(i+1))));
 
-
+    // Sätt gräsets "ljushet"
     colorShade = 0.2*rand()/float(RAND_MAX) + 0.65;
 
 
@@ -52,15 +54,11 @@ Grass::~Grass()
 
 void Grass::calculate(float windAngle,float windMagnitude, double timestep)
 {
-    segments[0].calculatePosition(windAngle, windMagnitude, base, initialAngleXY, initialAngleZX, timestep);
-    for (int i=1; i < NUM_SEGMENTS; i++)
-        segments[i].calculatePosition(windAngle, windMagnitude, segments[i-1].getPosition(), segments[i-1].getAngleXY(), initialAngleZX, timestep);
 
-}
+        segments[0].calculatePosition(windAngle, windMagnitude, base, initialAngleXY, timestep);
+        for (int i=1; i < NUM_SEGMENTS; i++)
+            segments[i].calculatePosition(windAngle, windMagnitude, segments[i-1].getPosition(), segments[i-1].getAngleXY(), timestep);
 
-Vector2f Grass::getBase()
-{
-    return Vector2f(base.x, base.z);
 }
 
 void Grass::draw()
@@ -89,16 +87,15 @@ void Grass::draw()
 
             Vector3f point = segments[i].getPosition();
 
-            glTexCoord2f(0.0f, (0.99f/NUM_SEGMENTS) * (i+1));
+            glTexCoord2f(0.0f, (0.98f/NUM_SEGMENTS) * (i+1));
             glVertex3f(point.x - 0.5*cosVal2, point.y, point.z - 0.5*sinVal2);
 
-            glTexCoord2f(1.0f, (0.99f/NUM_SEGMENTS) * (i+1));
+            glTexCoord2f(1.0f, (0.98f/NUM_SEGMENTS) * (i+1));
             glVertex3f(point.x + 0.5*cosVal2, point.y, point.z + 0.5*sinVal2);
         }
 
 
     glEnd();
-
 
 }
 
