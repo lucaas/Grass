@@ -138,8 +138,10 @@ BMPError BMPLoad(std::string fname,BMPClass& bmp)
 			{
 				BYTE byte;
 				fread(&byte,1,1,f);						//just read byte
-				for(int c=0;c<3;++c)
-					bmp.pixel(x,y,c)=cols[byte*4+2-c];	//and look up in the table
+				//for(int c=0;c<3;++c)
+				//	bmp.pixel(x,y,c)=cols[byte*4+2-c];	//and look up in the table
+
+                bmp.bytes[y*bmp.width+x] = byte;
 			}
 		break;
 

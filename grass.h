@@ -25,7 +25,8 @@ private:
 public:
     Grass();
     Grass(float x, float z);
-    void init(float x, float z);
+    Grass(float x, float y, float z);
+    void init(float x, float y, float z);
     Vector2f getBase();
 
     ~Grass();

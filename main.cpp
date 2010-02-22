@@ -18,11 +18,13 @@
 #include "grass.h"
 #include "camera.h"
 #include "BMPLoader.h"
+#include "terrain.h"
 
 // the program should be run standing in the source directory
 #define GRASS_TEXTURE_PATH "data/alfa.bmp"
 #define PLANE_TEXTURE_PATH "data/plane.bmp"
-
+#define HEIGHTMAP_PATH "data/heightmap.bmp"
+#define HEIGHTMAP_SIZE 32
 
 #define HELICOPTER 0
 #define NORMAL 1
@@ -44,7 +46,8 @@ Vector2f windCentre = Vector2f(0.0f, 0.0f);
 vector<Grass *> grasses;
 
 Camera camera;
-
+Terrain *terrain;
+int scale;
 
 Vector2f calculateWindAngle(Vector2f base);
 
@@ -76,13 +79,14 @@ static void display(void)
     glLoadIdentity();
     camera.move();
 
-    GLfloat light0_position[] = {15.0, 5.0, 15.0, 1.0};
+    GLfloat light0_position[] = {0.5*scale*HEIGHTMAP_SIZE, 10.0, 0.5*scale*HEIGHTMAP_SIZE, 1.0};
     glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
     GLint light0_direction[] = {-2, -1, -2};
 
     glLightiv(GL_LIGHT0, GL_SPOT_DIRECTION, light0_direction);
 
     //Draw plane
+ /*
     glBindTexture( GL_TEXTURE_2D, planeTexture );
     glBegin(GL_QUADS);
         glColor3f(0.3f,0.5f,0.2f);
@@ -98,9 +102,20 @@ static void display(void)
         glTexCoord2f(0.0f, 1.0f);
         glVertex3f( -10.0f, 0.0f, 10.0f);
     glEnd();
+*/
 
 
+    glBindTexture( GL_TEXTURE_2D, planeTexture );
 
+    glColor3f(0.3f,0.5f,0.2f);
+    terrain->render();
+
+   // glColor3f(1.0f,0.2f,0.2f);
+    glPushMatrix();
+        glTranslatef(15.0f, 5.0f, 15.0f);
+        //glutWireSphere(1.0, 32.0, 64.0);
+
+    glPopMatrix();
     // Draw grassess
 
     glLineWidth(3);
@@ -129,7 +144,7 @@ void setupScene()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    GLfloat light0_ambient[] = {0.0, 0.0, 0.0, 1.0};
+    GLfloat light0_ambient[] = {0.1, 0.1, 0.1, 1.0};
     GLfloat light0_diffuse[] = {1.0, 1.0, 1.0, 1.0};
     GLfloat light0_specular[] = {0.25, 0.25, 0.25, 1.0};
 
@@ -155,14 +170,28 @@ void setupScene()
 
     glClearColor(0.4,0.6,0.9,0.0);
 
-    // Populate the vector with Grass objects
-    for (int i=0; i < 5000; i++)
-       grasses.push_back(new Grass());
+    // Generate terrain
+    scale = 2;
+    terrain = new Terrain(HEIGHTMAP_PATH, HEIGHTMAP_SIZE, scale, 1.0f);
 
+    // Populate the vector with Grass objects
+    for (int i=0; i < 10000; i++)
+    {
+        float xpos = (HEIGHTMAP_SIZE-2)*scale*(rand()/float(RAND_MAX)) - 0.5*(HEIGHTMAP_SIZE-1)*scale;
+        float zpos = (HEIGHTMAP_SIZE-2)*scale*(rand()/float(RAND_MAX)) - 0.5*(HEIGHTMAP_SIZE-1)*scale;
+        float ypos = terrain->getHeight(xpos, zpos);
+
+       grasses.push_back(new Grass(xpos, ypos, zpos));
+    }
     sort(grasses.begin(), grasses.end(), compare);
 
     grassTexture = loadTexture(GRASS_TEXTURE_PATH, GL_RGBA);
     planeTexture = loadTexture(PLANE_TEXTURE_PATH, GL_RGB);
+
+
+
+
+
 
 
 }
