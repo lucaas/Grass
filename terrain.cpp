@@ -8,7 +8,7 @@
     #include <GL/glut.h>
 #endif
 
-Terrain::Terrain(char* path, int theSize, int theScale, float textureTile)
+Terrain::Terrain(char* path, int theSize, float theScale, float textureTile)
 {
     size = theSize;
     scale = theScale;
@@ -21,7 +21,7 @@ Terrain::Terrain(char* path, int theSize, int theScale, float textureTile)
     // calculate the 3D heightfield
     calculateHeightfield(bmp->bytes);
 
-    delete bmp;
+    //delete bmp;
 
 }
 

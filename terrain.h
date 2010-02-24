@@ -22,14 +22,14 @@ private:
         // Size of the terrain (ie. 128)
         int size;
         // Scaling factor (works best from 2 and above)
-        int scale;
+        float scale;
         // Texture tiling factors
         float uTile;
         float vTile;
 public:
-        Terrain(char* path, int size, int scale, float textureTile);
+        Terrain(char* path, int size, float scale, float textureTile);
         ~Terrain();
-        bool loadTerrain(char *filename, int size, int scale);
+        bool loadTerrain(char *filename, int size, float scale);
         void calculateHeightfield(unsigned char *hmap);
         void setTextureTiling(float u, float v) { uTile = u; vTile = v; }
         float getHeight(float x, float z);

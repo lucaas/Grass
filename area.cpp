@@ -1,6 +1,6 @@
 #include "area.h"
 
-#define MAXGRASS 75
+#define MAXGRASS 30
 #define HELICOPTER 0
 #define NORMAL 1
 #define BREEZE 2

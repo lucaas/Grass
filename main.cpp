@@ -25,8 +25,8 @@
 #define PLANE_TEXTURE_PATH "data/plane.bmp"
 #define HEIGHTMAP_PATH "data/heightmap.bmp"
 #define HEIGHTMAP_SIZE 32
-#define HEIGHTMAP_SCALE 1
-#define AREA_SIZE 2
+#define HEIGHTMAP_SCALE 0.5f
+#define AREA_SIZE 1
 
 #define HELICOPTER 0
 #define NORMAL 1
