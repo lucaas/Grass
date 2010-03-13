@@ -17,21 +17,31 @@
 #include "grass.h"
 #include "camera.h"
 #include "BMPLoader.h"
+#include "BMPWriter.h"
 #include "terrain.h"
 #include "area.h"
 
 // the program should be run standing in the source directory
+#define DO_MOVIE 1
 #define GRASS_TEXTURE_PATH "data/alfa.bmp"
 #define PLANE_TEXTURE_PATH "data/plane.bmp"
-#define HEIGHTMAP_PATH "data/heightmap.bmp"
-#define HEIGHTMAP_SIZE 32
-#define HEIGHTMAP_SCALE 0.5f
-#define AREA_SIZE 1
+#define SKY_TEXTURE_PATH "data/skybox_texture.bmp"
 
+    #define HEIGHTMAP_PATH "data/heightmap-big.bmp"
+    #define HEIGHTMAP_SIZE 128
+    #define HEIGHTMAP_SCALE .5f
+
+
+
+#define AREA_SIZE 1
 #define HELICOPTER 0
 #define NORMAL 1
 #define BREEZE 2
 #define TORNADO 3
+
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 480
+
 
 
 using namespace std;
@@ -41,8 +51,10 @@ float windMagnitude = 0.0f;
 int windType, k, fps = 0;
 char title [30];
 double lastTime = 0.0;
+int framecount = 0;
 GLuint grassTexture;
 GLuint planeTexture;
+GLuint skyTexture;
 
 Vector2f windCentre = Vector2f(0.0f, 0.0f);
 
@@ -53,6 +65,7 @@ int numGrasses = 0;
 Wind wind;
 
 Camera camera;
+
 Terrain *terrain;
 
 Vector2f calculateWindAngle(Vector2f base);
@@ -65,9 +78,14 @@ void RenderSkybox(Vector3f position,Vector3f size,GLuint *SkyBox);
 static void display(void)
 {
 
+    //camera.xpos = 0.001f;
+    camera.zpos -= 0.06f;
+    camera.yrot -= 0.1f;
+    wind.windCenter.x += 0.06;
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //RenderSkybox(camera.getPosition(), Vector3f(100,100,100), &planeTexture);
+    RenderSkybox(camera.getPosition(), Vector3f(100,100,100), &skyTexture);
 
 
     glLoadIdentity();
@@ -97,6 +115,19 @@ static void display(void)
     }
 
     glutSwapBuffers();
+
+    // make lots of bmp files of all frames in out folder.
+    if (DO_MOVIE)
+    {
+        glReadBuffer(GL_BACK);
+        GLvoid *imageData = malloc(WINDOW_WIDTH*WINDOW_HEIGHT*(8+8+8)); //Allocate memory for storing the image
+        glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+        char out[100];
+        sprintf(out, "out/frame%04i.bmp", framecount++);
+        bmp_write(out,(unsigned char*)imageData, WINDOW_WIDTH, WINDOW_HEIGHT);
+        if(framecount > 600) exit(0);
+    }
+
 }
 
 void setupScene()
@@ -134,7 +165,7 @@ void setupScene()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glClearColor(0.4,0.6,0.9,0.0);
-
+   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // Generate terrain
     terrain = new Terrain(HEIGHTMAP_PATH, HEIGHTMAP_SIZE, HEIGHTMAP_SCALE, 1.0f);
 
@@ -154,6 +185,7 @@ void setupScene()
 
     grassTexture = loadTexture(GRASS_TEXTURE_PATH, GL_RGBA);
     planeTexture = loadTexture(PLANE_TEXTURE_PATH, GL_RGB);
+    skyTexture = loadTexture(SKY_TEXTURE_PATH, GL_RGB);
 
 }
 
@@ -175,12 +207,16 @@ static void idle(void)
     }
 
         double timestep;
-        if (lastTime == 0.0 || t - lastTime > 0.03)
-            timestep = 0.03;
-        else
-            timestep = t - lastTime;
+        if (!DO_MOVIE)
+        {
 
-        lastTime = t;
+            if (lastTime == 0.0 || t - lastTime > 0.03)
+                timestep = 0.03;
+            else
+                timestep = t - lastTime;
+        }
+        else
+            timestep = 0.033;
 
         //ITERATOR FÖR AREAS
         vector<Area *>::iterator iter = areas.begin();
@@ -248,7 +284,8 @@ void RenderSkybox(Vector3f position,Vector3f size,GLuint *SkyBox)
 {
 // djoubert187 _at_ hotmail.com
 	// Begin DrawSkybox
-	glColor4f(0.4, 0.7, 1.0,1.0f);
+	glDisable(GL_LIGHTING);
+	glColor4f(1.0, 1.0, 1.0, 1.0f);
 
 	// Save Current Matrix
 	glPushMatrix();
@@ -313,6 +350,7 @@ void RenderSkybox(Vector3f position,Vector3f size,GLuint *SkyBox)
 
 	// Load Saved Matrix
 	glPopMatrix();
+    glEnable(GL_LIGHTING);
 
 };
 
@@ -419,7 +457,7 @@ int main(int argc, char *argv[])
    srand (time(NULL));
 
     glutInit(&argc, argv);
-    glutInitWindowSize(800, 600);
+    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     glutInitWindowPosition(10,10);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 

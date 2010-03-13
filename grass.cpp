@@ -23,7 +23,7 @@ void Grass::init(float x, float y, float z)
     base.x = x;
     base.y = y;
     base.z = z;
-    initialAngleXY = 80.0f + 20.0*(rand()/float(RAND_MAX)); // 80-100 degrees
+    initialAngleXY = 60.0f + 60.0*(rand()/float(RAND_MAX)); // 80-100 degrees
     initialAngleZX = 360.0*(rand()/float(RAND_MAX)); // 0-360 degrees
 
     // gräsets längd, skapa segment

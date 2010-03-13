@@ -7,10 +7,10 @@
 
 Wind::Wind()
 {
-    windCenter = Vector2f(0.0f, 0.0f);
+    windCenter = Vector2f(-20.0f, 10.0f);
     windAngle = 0.0f;
     windMagnitude = 0.0f;
-    windType = HELICOPTER;
+    windType = NORMAL;
 }
 
 void Wind::setWindCenter(Vector2f center)
@@ -60,6 +60,8 @@ Vector2f Wind::calculateHelicopter(Vector2f source)
     else if(source.x == 0.0 && source.y < 0.0) windAngle = M_PI*1.5;
     else windAngle = 0;
     windAngle += M_PI/2;
+
+
 
     windMagnitude += 0.0005 - 0.001*rand()/(RAND_MAX);
 

@@ -12,13 +12,13 @@
 using namespace std;
 
 class Wind {
-private:
+public:
 Vector2f windCenter;
 float windAngle;
 float windMagnitude;
 int windType;
 
-public:
+
 Wind();
 void setWindCenter(Vector2f center);
 void setWindType(int type);

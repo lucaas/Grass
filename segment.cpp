@@ -7,7 +7,7 @@
 #include "segment.h"
 #include <cstdlib>
 
-#define FRICTION 0.98
+#define FRICTION 0.9999
 #define GRAVITY 9.82
 
 
@@ -85,6 +85,7 @@ void Segment::calculatePosition(float windAngle, float windMagnitude, const Vect
     angleXY = (angleXY < 90 - 110) ? 90 - 110 : angleXY;
 
     // uppdatera rotation i planet
+
     angleZX += 0.1*(windAngle - angleZX);
 
     // updatera position för segmentet

@@ -10,7 +10,7 @@
 
 class Camera
 {
-private:
+public:
 // Variables to save current state
 float xpos;
 float ypos;
@@ -19,7 +19,6 @@ float xrot;
 float yrot;
 float lastx, lasty;
 
-public:
     Camera();
     void move (void);
     void key (unsigned char key, int x, int y);

@@ -9,11 +9,11 @@
 
 Camera::Camera()
 {
-    xpos = 0;
-    ypos = 3;
-    zpos = 15;
-    xrot = 20;
-    yrot = 0;
+    xpos = 30;
+    ypos = 8;
+    zpos = 30;
+    xrot = 10;
+    yrot = 270 + 45;
 }
 
 void Camera::move (void) {
