@@ -16,8 +16,7 @@ public:
 Vector2f windCenter;
 float windAngle;
 float windMagnitude;
-int windType;
-
+static int WINDTYPE;
 
 Wind();
 void setWindCenter(Vector2f center);
@@ -32,7 +31,7 @@ void changeWindAngle(float step);
 float getWindAngle() { return windAngle; };
 float getWindMagnitude() { return windMagnitude; };
 Vector2f getWindCenter() { return windCenter; };
-int getWindType(){return windType;};
+int getWindType(){return WINDTYPE;};
 void clearWind() { windAngle = 0.0f; windMagnitude = 0.0f; };
 
 };

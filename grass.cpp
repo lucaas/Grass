@@ -19,6 +19,8 @@ Grass::Grass(float x, float y, float z)
 
 void Grass::init(float x, float y, float z)
 {
+    segments = new Segment[NUM_SEGMENTS];
+
     // Startposition och vinkel
     base.x = x;
     base.y = y;

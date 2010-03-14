@@ -10,7 +10,6 @@ Wind::Wind()
     windCenter = Vector2f(-20.0f, 10.0f);
     windAngle = 0.0f;
     windMagnitude = 0.0f;
-    windType = NORMAL;
 }
 
 void Wind::setWindCenter(Vector2f center)
@@ -20,12 +19,12 @@ void Wind::setWindCenter(Vector2f center)
 
 void Wind::setWindType(int type)
 {
-    windType = type;
+    WINDTYPE = type;
 }
 
 Vector2f Wind::calculateWind(Vector2f source)
 {
-    switch(windType)
+    switch(WINDTYPE)
     {
         case HELICOPTER:
             return calculateHelicopter(source);

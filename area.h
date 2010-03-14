@@ -21,12 +21,11 @@ using namespace std;
 
 class Area {
 
-private:
+public:
 vector<Grass *> grasses;
 float density, size;
 Vector2f center;
-
-public:
+static int MAXGRASS;
 
 Area();
 Area(float density, float size, Vector2f center, Terrain *terrain);

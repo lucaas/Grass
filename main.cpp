@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <sstream>
 #include <string>
+#include <iostream>
+#include <fstream>
 
 #include "wind.h"
 #include "vmath.h"
@@ -22,30 +24,32 @@
 #include "area.h"
 
 // the program should be run standing in the source directory
-#define DO_MOVIE 1
 #define GRASS_TEXTURE_PATH "data/alfa.bmp"
 #define PLANE_TEXTURE_PATH "data/plane.bmp"
 #define SKY_TEXTURE_PATH "data/skybox_texture.bmp"
 
     #define HEIGHTMAP_PATH "data/heightmap-big.bmp"
-    #define HEIGHTMAP_SIZE 128
-    #define HEIGHTMAP_SCALE .5f
 
 
+#define AREA_SIZE 4
 
-#define AREA_SIZE 1
 #define HELICOPTER 0
 #define NORMAL 1
 #define BREEZE 2
 #define TORNADO 3
+int WINDOW_WIDTH;
+int WINDOW_HEIGHT;
 
-#define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 480
+int HEIGHTMAP_SIZE;
+float HEIGHTMAP_SCALE;
 
-
+int Area::MAXGRASS;
+int Wind::WINDTYPE;
+int Grass::NUM_SEGMENTS;
+float Grass::BASE_WIDTH;
 
 using namespace std;
-
+float DO_MOVIE;
 float windAngle = 0.0f;
 float windMagnitude = 0.0f;
 int windType, k, fps = 0;
@@ -70,7 +74,9 @@ Terrain *terrain;
 
 Vector2f calculateWindAngle(Vector2f base);
 
-bool compare(const Area *a, const Area *b);
+bool compareArea(const Area *a, const Area *b);
+
+bool compareGrass(const Grass *a, const Grass *b);
 GLuint loadTexture(char *texturepath, GLuint channels);
 void RenderSkybox(Vector3f position,Vector3f size,GLuint *SkyBox);
 
@@ -79,9 +85,13 @@ static void display(void)
 {
 
     //camera.xpos = 0.001f;
-    camera.zpos -= 0.06f;
-    camera.yrot -= 0.1f;
-    wind.windCenter.x += 0.06;
+   // camera.xpos += cos(2*M_PI/120*framecount);
+   // camera.zpos -= sin(2*M_PI/120*framecount);;
+   // camera.yrot -= 0.12f;
+
+   // wind.windCenter.x += 0.06;
+
+
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -181,7 +191,7 @@ void setupScene()
         }
     }
 
-    sort(areas.begin(), areas.end(), compare);
+    sort(areas.begin(), areas.end(), compareArea);
 
     grassTexture = loadTexture(GRASS_TEXTURE_PATH, GL_RGBA);
     planeTexture = loadTexture(PLANE_TEXTURE_PATH, GL_RGB);
@@ -231,7 +241,7 @@ static void idle(void)
 
 }
 
-bool compare(const Area *a, const Area *b)
+bool compareArea(const Area *a, const Area *b)
 {
     Vector2f cameraPos = Vector2f(camera.getPosition().x, camera.getPosition().z);
 
@@ -240,6 +250,16 @@ bool compare(const Area *a, const Area *b)
 
     return aDiff.lengthSq() > bDiff.lengthSq();
 
+}
+
+bool compareGrass(const Grass *a, const Grass *b)
+{
+    Vector2f cameraPos = Vector2f(camera.getPosition().x, camera.getPosition().z);
+
+    Vector2f aDiff = a->getBase() - cameraPos;
+    Vector2f bDiff = b->getBase() - cameraPos;
+
+    return aDiff.lengthSq() > bDiff.lengthSq();
 }
 
 GLuint loadTexture(char *texturepath, GLuint channels)
@@ -360,7 +380,13 @@ void key (unsigned char key, int x, int y)
 {
     if (key=='w' || key=='a' || key=='s' || key=='d'){
         camera.key(key, x, y);
-        sort(areas.begin(), areas.end(), compare);
+        sort(areas.begin(), areas.end(), compareArea);
+        vector<Area *>::iterator iter = areas.begin();
+        while(iter != areas.end())
+        {
+            sort((*iter)->grasses.begin(), (*iter)->grasses.end(), compareGrass);
+            iter++;
+        }
     }
 
     //dsprintf("wind: %f\t%f\n", windAngle, windMagnitude);
@@ -454,7 +480,32 @@ static void resize(int width, int height)
 
 int main(int argc, char *argv[])
 {
-   srand (time(NULL));
+    vector<float> settings;
+    float value;
+    string line;
+    ifstream myfile ("data/config.txt");
+    if (myfile.is_open())
+    {
+        while (myfile >> line && myfile >> value)
+        {
+            cout << line << " " << value << endl;
+            settings.push_back(value);
+        }
+        myfile.close();
+    }
+    else cout << "Unable to open file";
+
+    Area::MAXGRASS = settings[0];
+    DO_MOVIE = settings[1];
+    Wind::WINDTYPE = settings[2];
+    Grass::NUM_SEGMENTS = settings[3];
+    Grass::BASE_WIDTH = settings[4];
+    WINDOW_WIDTH = settings[5];
+    WINDOW_HEIGHT = settings[6];
+    HEIGHTMAP_SIZE = settings[7];
+    HEIGHTMAP_SCALE = settings[8];
+
+    srand (time(NULL));
 
     glutInit(&argc, argv);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);

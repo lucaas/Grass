@@ -9,9 +9,6 @@
 #include <math.h>
 #include "segment.h"
 
-#define NUM_SEGMENTS 3
-#define BASE_WIDTH  0.15
-
 #ifndef __GRASS_H__
 #define __GRASS_H__
 
@@ -19,13 +16,15 @@ class Grass
 {
 private:
     Vector3f base;
-    Segment segments[NUM_SEGMENTS];
+    Segment *segments;
 
     float initialAngleXY; // Jämviktsläge
     float initialAngleZX; // Jämviktsläge
     float colorShade;
 
 public:
+    static int NUM_SEGMENTS;
+    static float BASE_WIDTH;
     Grass();
     Grass(float x, float y, float z);
     void init(float x, float y, float z);
