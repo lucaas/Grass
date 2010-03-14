@@ -77,20 +77,25 @@ Terrain *terrain;
 
 Vector2f calculateWindAngle(Vector2f base);
 
+void sortGrasses();
 bool compareArea(const Area *a, const Area *b);
-
 bool compareGrass(const Grass *a, const Grass *b);
 GLuint loadTexture(char *texturepath, GLuint channels);
 void RenderSkybox(Vector3f position,Vector3f size,GLuint *SkyBox);
+
 
 
 static void display(void)
 {
 
     //camera.xpos = 0.001f;
-   // camera.xpos += cos(2*M_PI/120*framecount);
-   // camera.zpos -= sin(2*M_PI/120*framecount);;
-   // camera.yrot -= 0.12f;
+    //camera.xpos += 0.01f;
+    if(DO_MOVIE)
+    {
+        camera.zpos -= 0.03f;
+        camera.yrot -= 0.08f;
+        sortGrasses();
+    }
 
    // wind.windCenter.x += 0.06;
 
@@ -202,7 +207,7 @@ void setupScene()
         }
     }
 
-    sort(areas.begin(), areas.end(), compareArea);
+    sortGrasses();
 
     grassTexture = loadTexture(GRASS_TEXTURE_PATH, GL_RGBA);
     planeTexture = loadTexture(PLANE_TEXTURE_PATH, GL_RGB);
@@ -267,8 +272,8 @@ bool compareGrass(const Grass *a, const Grass *b)
 {
     Vector2f cameraPos = Vector2f(camera.getPosition().x, camera.getPosition().z);
 
-    Vector2f aDiff = a->getBase() - cameraPos;
-    Vector2f bDiff = b->getBase() - cameraPos;
+    Vector2f aDiff = a->getAreaBase() - cameraPos;
+    Vector2f bDiff = b->getAreaBase() - cameraPos;
 
     return aDiff.lengthSq() > bDiff.lengthSq();
 }
@@ -385,19 +390,23 @@ void RenderSkybox(Vector3f position,Vector3f size,GLuint *SkyBox)
 
 };
 
+void sortGrasses()
+{
+    sort(areas.begin(), areas.end(), compareArea);
+    vector<Area *>::iterator iter = areas.begin();
+    while(iter != areas.end())
+    {
+        sort((*iter)->grasses.begin(), (*iter)->grasses.end(), compareGrass);
+        iter++;
+    }
+}
 
 /* ----------------- GLUT callback Handlers */
 void key (unsigned char key, int x, int y)
 {
     if (key=='w' || key=='a' || key=='s' || key=='d'){
         camera.key(key, x, y);
-        sort(areas.begin(), areas.end(), compareArea);
-        vector<Area *>::iterator iter = areas.begin();
-        while(iter != areas.end())
-        {
-            sort((*iter)->grasses.begin(), (*iter)->grasses.end(), compareGrass);
-            iter++;
-        }
+        sortGrasses();
     }
 
     //dsprintf("wind: %f\t%f\n", windAngle, windMagnitude);

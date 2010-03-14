@@ -7,7 +7,7 @@
 
 Wind::Wind()
 {
-    windCenter = Vector2f(-20.0f, 10.0f);
+    windCenter = Vector2f(0.0f, 0.0f);
     windAngle = 0.0f;
     windMagnitude = 0.0f;
 }
@@ -60,11 +60,11 @@ Vector2f Wind::calculateHelicopter(Vector2f source)
     else windAngle = 0;
     windAngle += M_PI/2;
 
+    float windMagnitude2 = windMagnitude*(2/(length+0.001f)) + 0.25 - 0.5*rand()/(RAND_MAX);
+    windMagnitude2 = (windMagnitude2 > 3.0f) ? 3.0f : windMagnitude2;
+    windMagnitude2 = (windMagnitude2 < -0.25f) ? -0.25f : windMagnitude2;
 
-
-    windMagnitude += 0.0005 - 0.001*rand()/(RAND_MAX);
-
-    return Vector2f(windAngle * (180/M_PI), windMagnitude*(2/(length+0.001f)));
+    return Vector2f(windAngle * (180/M_PI), windMagnitude2);
 }
 
 Vector2f Wind::calculateNormal(Vector2f source)
@@ -73,6 +73,8 @@ Vector2f Wind::calculateNormal(Vector2f source)
 
     return Vector2f(windAngle, windMagnitude);
 }
+
+
 
 Vector2f Wind::calculateBreeze(Vector2f source)
 {
@@ -97,9 +99,11 @@ Vector2f Wind::calculateTornado(Vector2f source)
     else if(source.x == 0.0 && source.y < 0.0) windAngle = M_PI*1.5;
     else windAngle = 0;
 
-    windMagnitude += 0.0005 - 0.001*rand()/(RAND_MAX);
+    float windMagnitude2 = windMagnitude*(2/(length+0.001f)) + 0.25 - 0.5*rand()/(RAND_MAX);
+    windMagnitude2 = (windMagnitude2 > 3.0f) ? 3.0f : windMagnitude2;
+    windMagnitude2 = (windMagnitude2 < -0.25f) ? -0.25f : windMagnitude2;
 
-    return Vector2f(windAngle * (180/M_PI), windMagnitude*(2/(length+0.001f)));
+    return Vector2f(windAngle * (180/M_PI), windMagnitude2);
 }
 
 void Wind::changeWindMagnitude(float step)

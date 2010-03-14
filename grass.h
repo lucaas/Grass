@@ -23,10 +23,11 @@ private:
     float colorShade;
 
 public:
+    Vector2f areabase;
     static int NUM_SEGMENTS;
     static float BASE_WIDTH;
     Grass();
-    Grass(float x, float y, float z);
+    Grass(float x, float y, float z, float camX, float camZ);
     void init(float x, float y, float z);
 
     ~Grass();
@@ -35,6 +36,7 @@ public:
     void calculate(float windAngle,float windMagnitude, double timestep);
     Vector3f getPosition() const { return segments[0].getPosition(); }
     Vector2f getBase() const { return Vector2f(base.x, base.z); };
+    Vector2f getAreaBase() const { return Vector2f(areabase.x + base.x, areabase.y + base.z); };
 };
 
 #endif

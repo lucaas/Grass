@@ -27,7 +27,7 @@ void Area::init(float density, float size, Vector2f center, Terrain *terrain)
         float xpos = size*(rand()/float(RAND_MAX)) - size/2;
         float zpos = size*(rand()/float(RAND_MAX)) - size/2;
         float ypos = terrain->getHeight(center.x + xpos, center.y + zpos);
-        grasses.push_back(new Grass(xpos, ypos, zpos));
+        grasses.push_back(new Grass(xpos, ypos, zpos, center.x, center.y));
     }
 }
 

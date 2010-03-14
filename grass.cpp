@@ -12,9 +12,11 @@ Grass::Grass()
 }
 
 
-Grass::Grass(float x, float y, float z)
+Grass::Grass(float x, float y, float z, float camX, float camZ)
 {
     init(x, y, z);
+    areabase.x = camX;
+    areabase.y = camZ;
 }
 
 void Grass::init(float x, float y, float z)
