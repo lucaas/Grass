@@ -53,7 +53,7 @@ void Terrain::calculateHeightfield(unsigned char *hmap)
                 vert.z = (float)y * scale - 0.5*size*scale;
                 // calculate the height from the value in the heightmap
 
-                vert.y = (float)(hmap[currVertex] * (5/255.0f));
+                vert.y = (float)(hmap[currVertex] * (MAX_HEIGHT/255.0f));
 
                 // calculate the texture coordinates
                 vert.u = uTile * ((float)x * texdelta * 0.5f);

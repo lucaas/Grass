@@ -49,6 +49,7 @@ float DENSITYMAP_SCALE;
 int Area::MAXGRASS;
 int Wind::WINDTYPE;
 int Grass::NUM_SEGMENTS;
+int Terrain::MAX_HEIGHT;
 float Grass::BASE_WIDTH;
 
 using namespace std;
@@ -515,7 +516,7 @@ int main(int argc, char *argv[])
     }
     else cout << "Unable to open file";
 
-    Area::MAXGRASS = settings[0];
+    Area::MAXGRASS = settings[0]/(settings[9]*settings[9]);
     DO_MOVIE = settings[1];
     Wind::WINDTYPE = settings[2];
     Grass::NUM_SEGMENTS = settings[3];
@@ -526,6 +527,7 @@ int main(int argc, char *argv[])
     HEIGHTMAP_SCALE = settings[8];
     DENSITYMAP_SIZE = settings[9];
     DENSITYMAP_SCALE = settings[10];
+    Terrain::MAX_HEIGHT = settings[11];
 
     srand (time(NULL));
 

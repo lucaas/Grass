@@ -27,6 +27,7 @@ private:
         float uTile;
         float vTile;
 public:
+        static int MAX_HEIGHT;
         Terrain(char* path, int size, float scale, float textureTile);
         ~Terrain();
         bool loadTerrain(char *filename, int size, float scale);
