@@ -22,10 +22,13 @@
 #include "area.h"
 
 // the program should be run standing in the source directory
-#define DO_MOVIE 1
+#define DO_MOVIE 0
 #define GRASS_TEXTURE_PATH "data/alfa.bmp"
 #define PLANE_TEXTURE_PATH "data/plane.bmp"
 #define SKY_TEXTURE_PATH "data/skybox_texture.bmp"
+#define DENSITYMAP_PATH "data/densitymap.bmp"
+#define DENSITYMAP_SIZE 32
+#define DENSITYMAP_SCALE 1.0f
 
     #define HEIGHTMAP_PATH "data/heightmap-big.bmp"
     #define HEIGHTMAP_SIZE 128
@@ -33,7 +36,7 @@
 
 
 
-#define AREA_SIZE 1
+
 #define HELICOPTER 0
 #define NORMAL 1
 #define BREEZE 2
@@ -79,9 +82,9 @@ static void display(void)
 {
 
     //camera.xpos = 0.001f;
-    camera.zpos -= 0.06f;
-    camera.yrot -= 0.1f;
-    wind.windCenter.x += 0.06;
+    //camera.zpos -= 0.06f;
+    //dddddcamera.yrot -= 0.1f;
+    //wind.windCenter.x += 0.06;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -91,7 +94,7 @@ static void display(void)
     glLoadIdentity();
     camera.move();
 
-    GLfloat light0_position[] = {0.5*HEIGHTMAP_SCALE*HEIGHTMAP_SIZE, 10.0, 0.5*HEIGHTMAP_SCALE*HEIGHTMAP_SIZE, 1.0};
+    GLfloat light0_position[] = {0.6*HEIGHTMAP_SCALE*HEIGHTMAP_SIZE, 10.0, 0.6*HEIGHTMAP_SCALE*HEIGHTMAP_SIZE, 1.0};
     glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
     GLint light0_direction[] = {-2, -1, -2};
 
@@ -172,11 +175,20 @@ void setupScene()
     wind = Wind();
 
     numGrasses = 0;
-    // Populate the vector with Area objects
-    for(int i = -0.5*HEIGHTMAP_SIZE*HEIGHTMAP_SCALE + 0.5*AREA_SIZE; i < 0.5*HEIGHTMAP_SIZE*HEIGHTMAP_SCALE; i += AREA_SIZE) {
-        for(int j = -0.5*HEIGHTMAP_SIZE*HEIGHTMAP_SCALE + 0.5*AREA_SIZE; j < 0.5*HEIGHTMAP_SIZE*HEIGHTMAP_SCALE; j += AREA_SIZE) {
-            float density = (rand()/(float)RAND_MAX)+0.1;
-            areas.push_back(new Area(density, AREA_SIZE, Vector2f(i, j), terrain));
+
+    BMPClass *densitybmp = new BMPClass();
+	BMPLoad(DENSITYMAP_PATH, *densitybmp);
+
+	float area_size = HEIGHTMAP_SIZE*HEIGHTMAP_SCALE/(DENSITYMAP_SCALE*DENSITYMAP_SIZE);
+
+	for (int y=0; y < densitybmp->height; y++)
+    {
+        for (int x=0; x < densitybmp->width; x++)
+        {
+            float i = area_size*x-0.5f*HEIGHTMAP_SIZE*HEIGHTMAP_SCALE + 0.5f*area_size;
+            float j = area_size*y-0.5f*HEIGHTMAP_SIZE*HEIGHTMAP_SCALE + 0.5f*area_size;
+            float density = densitybmp->bytes[y*densitybmp->width + x] / 255.0f;
+            areas.push_back(new Area(density, area_size, Vector2f(i, j), terrain));
             numGrasses += (areas.back())->getSize();
         }
     }
