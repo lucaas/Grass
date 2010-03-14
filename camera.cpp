@@ -9,10 +9,10 @@
 
 Camera::Camera()
 {
-    xpos = 30;
-    ypos = 8;
-    zpos = 30;
-    xrot = 10;
+    xpos = 20;
+    ypos = 15;
+    zpos = 20;
+    xrot = 30;
     yrot = 270 + 45;
 }
 

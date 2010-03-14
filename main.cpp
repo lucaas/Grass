@@ -30,7 +30,7 @@
 #define DENSITYMAP_PATH "data/densitymap.bmp"
 
 
-    #define HEIGHTMAP_PATH "data/heightmap-big.bmp"
+    #define HEIGHTMAP_PATH "data/heightmap.bmp"
 
 #define HELICOPTER 0
 #define NORMAL 1
@@ -103,7 +103,7 @@ static void display(void)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    RenderSkybox(camera.getPosition(), Vector3f(100,100,100), &skyTexture);
+    //RenderSkybox(camera.getPosition(), Vector3f(100,100,100), &skyTexture);
 
 
     glLoadIdentity();
@@ -196,9 +196,9 @@ void setupScene()
 
 	float area_size = HEIGHTMAP_SIZE*HEIGHTMAP_SCALE/(DENSITYMAP_SCALE*DENSITYMAP_SIZE);
 
-	for (int y=0; y < densitybmp->height; y++)
+	for (int y=1; y < densitybmp->height -1 ; y++)
     {
-        for (int x=0; x < densitybmp->width; x++)
+        for (int x=1; x < densitybmp->width -1; x++)
         {
             float i = area_size*x-0.5f*HEIGHTMAP_SIZE*HEIGHTMAP_SCALE + 0.5f*area_size;
             float j = area_size*y-0.5f*HEIGHTMAP_SIZE*HEIGHTMAP_SCALE + 0.5f*area_size;

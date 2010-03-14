@@ -78,7 +78,7 @@ Vector2f Wind::calculateNormal(Vector2f source)
 
 Vector2f Wind::calculateBreeze(Vector2f source)
 {
-    windAngle = sin(source.x/(source.y + 0.000001f));
+    windAngle = cos(source.x)*sin(source.x/(source.y + 0.000001f));
     windAngle = windAngle * 180/M_PI;
     windMagnitude = 0.125/2 - .125*rand()/(RAND_MAX);
 
