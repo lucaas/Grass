@@ -58,7 +58,7 @@ Terrain *terrain;
 Vector2f calculateWindAngle(Vector2f base);
 
 bool compare(const Area *a, const Area *b);
-GLuint loadTexture(char *texturepath, GLuint channels);
+GLuint loadTexture(const char *texturepath, GLuint channels);
 void RenderSkybox(Vector3f position,Vector3f size,GLuint *SkyBox);
 
 
@@ -206,7 +206,7 @@ bool compare(const Area *a, const Area *b)
 
 }
 
-GLuint loadTexture(char *texturepath, GLuint channels)
+GLuint loadTexture(const char *texturepath, GLuint channels)
 {
     GLuint texture;
 

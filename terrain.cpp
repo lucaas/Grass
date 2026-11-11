@@ -8,7 +8,7 @@
     #include <GL/glut.h>
 #endif
 
-Terrain::Terrain(char* path, int theSize, float theScale, float textureTile)
+Terrain::Terrain(const char* path, int theSize, float theScale, float textureTile)
 {
     size = theSize;
     scale = theScale;
