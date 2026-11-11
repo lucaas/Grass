@@ -27,9 +27,9 @@ private:
         float uTile;
         float vTile;
 public:
-        Terrain(char* path, int size, float scale, float textureTile);
+        Terrain(const char* path, int size, float scale, float textureTile);
         ~Terrain();
-        bool loadTerrain(char *filename, int size, float scale);
+        bool loadTerrain(const char *filename, int size, float scale);
         void calculateHeightfield(unsigned char *hmap);
         void setTextureTiling(float u, float v) { uTile = u; vTile = v; }
         float getHeight(float x, float z);

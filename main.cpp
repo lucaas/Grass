@@ -39,7 +39,7 @@ using namespace std;
 float windAngle = 0.0f;
 float windMagnitude = 0.0f;
 int windType, k, fps = 0;
-char title [30];
+char title [64];
 double lastTime = 0.0;
 GLuint grassTexture;
 GLuint planeTexture;
@@ -58,7 +58,7 @@ Terrain *terrain;
 Vector2f calculateWindAngle(Vector2f base);
 
 bool compare(const Area *a, const Area *b);
-GLuint loadTexture(char *texturepath, GLuint channels);
+GLuint loadTexture(const char *texturepath, GLuint channels);
 void RenderSkybox(Vector3f position,Vector3f size,GLuint *SkyBox);
 
 
@@ -168,7 +168,7 @@ static void idle(void)
     double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
 
     if(t>k){
-        sprintf(title,"Grass - [ FPS: %i | OBJ: %i ]", fps, numGrasses);
+        snprintf(title, sizeof(title), "Grass - [ FPS: %i | OBJ: %i ]", fps, numGrasses);
         glutSetWindowTitle(title);
         k++;
         fps = 0;
@@ -206,7 +206,7 @@ bool compare(const Area *a, const Area *b)
 
 }
 
-GLuint loadTexture(char *texturepath, GLuint channels)
+GLuint loadTexture(const char *texturepath, GLuint channels)
 {
     GLuint texture;
 
