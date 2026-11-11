@@ -40,7 +40,7 @@ void Grass::init(float x, float y, float z)
 
 Grass::~Grass()
 {
-    delete segments;
+    // segments is a fixed-size member array; nothing to free
 }
 
 void Grass::calculate(float windAngle,float windMagnitude, double timestep)
